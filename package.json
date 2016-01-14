@@ -1,0 +1,22 @@
+{
+  "name": "pb_map_web",
+  "version": "1.0.0",
+  "description": "PaddleBuddy web application",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://klaseter3@github.gatech.edu/klaseter3/pb_map_web.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.14.2",
+    "express": "^4.13.3",
+    "method-override": "^2.3.5",
+    "mongoose": "^4.3.5",
+    "morgan": "^1.6.1"
+  }
+}
