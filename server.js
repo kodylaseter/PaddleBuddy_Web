@@ -21,15 +21,12 @@ app.use(methodOverride());
 app.set('port', process.env.PORT || 8080);
 
 //ROUTES
-app.get('*', function(req, res) {
-    res.sendfile('./public/index.html');
-});
 
-// api ---------------------------------------------------------------------
-app.get('/api/point', function(req, res) {
+app.get('/api/points', function(req, res) {
 
     // use mongoose to get all todos in the database
     Point.find(function(err, points) {
+        console.log('points get called');
 
         // if there is an error retrieving, send the error. nothing after res.send(err) will execute
         if (err)
@@ -39,5 +36,20 @@ app.get('/api/point', function(req, res) {
     });
 });
 
+app.post('/api/points', function(req, res) {
+    Point.create({
+        lat: req.body.lat,
+        long: req.body.long
+    }, function(err, point) {
+        if (err) res.send(err);
+    });
+});
+
+app.get('*', function(req, res) {
+    res.sendfile('./public/index.html');
+});
+
+
+//launch server--------------------------------------------
 app.listen(8080);
 console.log("App listening on port 8080");
