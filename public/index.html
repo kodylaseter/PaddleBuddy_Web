@@ -1,0 +1,77 @@
+<!doctype html>
+<html ng-app="pbWeb">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+    <title>PaddleBuddy Map Data</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><!-- load jquery -->
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script><!-- load angular -->
+    <script src="core.js"></script>
+    <style type="text/css">
+        html, body { height: 100%; margin: 0; padding: 0; }
+        #map { height: 100%; }
+    </style>
+</head>
+<body ng-controller="mainController">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">PaddleBuddy</a>
+        </div>
+    </nav>
+    <div class="container">
+
+        <!-- HEADER AND TODO COUNT -->
+        <div class="jumbotron text-center">
+            <h1>I'm a Todo-aholic <span class="label label-info">{{ todos.length }}</span></h1>
+        </div>
+
+        <!-- TODO LIST -->
+        <div id="todo-list" class="row">
+            <div class="col-sm-4 col-sm-offset-4">
+
+                <!-- LOOP OVER THE TODOS IN $scope.todos -->
+                <div class="checkbox" ng-repeat="todo in todos">
+                    <label>
+                        <input type="checkbox" ng-click="deleteTodo(todo._id)"> {{ todo.text }}
+                    </label>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- FORM TO CREATE TODOS -->
+        <div id="todo-form" class="row">
+            <div class="col-sm-8 col-sm-offset-2 text-center">
+                <form>
+                    <div class="form-group">
+
+                        <!-- BIND THIS VALUE TO formData.text IN ANGULAR -->
+                        <input type="text" class="form-control input-lg text-center" placeholder="I want to buy a puppy that will love me forever" ng-model="formData.text">
+                    </div>
+
+                    <!-- createToDo() WILL CREATE NEW TODOS -->
+                    <button type="submit" class="btn btn-primary btn-lg" ng-click="createTodo()">Add</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!--<div class="container" id="map"></div>-->
+    <script type="text/javascript">
+
+    var map;
+    function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+            center: {lat: 33.755, lng: -84.39},
+            zoom: 8
+        });
+    }
+
+    </script>
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBIuCKiNReJwTU4frhP3ndPyvdrZt60pJU&callback=initMap">
+    </script>
+</body>
+</html>
