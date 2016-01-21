@@ -7,11 +7,12 @@
     <title>PaddleBuddy Map Data</title>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><!-- load jquery -->
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script><!-- load angular -->
+    <script src="https://rawgit.com/allenhwkim/angularjs-google-maps/master/build/scripts/ng-map.js"></script>
+    <script src="/../node_modules/angular-google-maps\dist"
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBIuCKiNReJwTU4frhP3ndPyvdrZt60pJU">
+    </script>
     <script src="core.js"></script>
-    <style type="text/css">
-        html, body { height: 100%; margin: 0; padding: 0; }
-        #map { height: 100%; }
-    </style>
 </head>
 <body ng-controller="mainController">
     <nav class="navbar navbar-default">
@@ -19,56 +20,7 @@
             <a class="navbar-brand" href="#">PaddleBuddy</a>
         </div>
     </nav>
-    <div class="container">
+    <ui-gmap-google-map center="map.center" zoom="map.zoom" style="height: 400px"></ui-gmap-google-map>
 
-        <!-- HEADER AND TODO COUNT -->
-        <div class="jumbotron text-center">
-            <h1>Points!</h1>
-        </div>
-
-        <div id="point-list" class="row">
-            <div class="col-sm-4 col-sm-offset-4">
-
-                <!-- LOOP OVER THE TODOS IN $scope.todos -->
-                <div ng-repeat="point in points">
-                    <label>{{point.lat}}</label>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- FORM TO CREATE TODOS -->
-        <div id="todo-form" class="row">
-            <div class="col-sm-8 col-sm-offset-2 text-center">
-                <form>
-                    <div>
-
-                        <input type="text" class="form-control input-lg text-center" ng-model="formDataLat">
-                        <input type="text" class="form-control input-lg text-center" ng-model="formDataLong">
-                    </div>
-
-                    <!-- createToDo() WILL CREATE NEW TODOS -->
-                    <button type="submit" class="btn btn-primary btn-lg" ng-click="addPoint()">Add</button>
-                </form>
-            </div>
-        </div>
-
-    </div>
-
-    <!--<div class="container" id="map"></div>-->
-    <!--<script type="text/javascript">-->
-
-    <!--var map;-->
-    <!--function initMap() {-->
-        <!--map = new google.maps.Map(document.getElementById('map'), {-->
-            <!--center: {lat: 33.755, lng: -84.39},-->
-            <!--zoom: 8-->
-        <!--});-->
-    <!--}-->
-
-    <!--</script>-->
-    <script async defer
-            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBIuCKiNReJwTU4frhP3ndPyvdrZt60pJU&callback=initMap">
-    </script>
 </body>
 </html>
