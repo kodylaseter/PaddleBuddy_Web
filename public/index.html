@@ -4,22 +4,22 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/map.css">
     <title>PaddleBuddy Map Data</title>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><!-- load jquery -->
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script><!-- load angular -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBIuCKiNReJwTU4frhP3ndPyvdrZt60pJU">
     </script>
-    <script src="/../node_modules/angular-google-maps/dist/angular-google-maps.min.js"></script>
     <script src="core.js"></script>
 
 </head>
-<body ng-controller="mainController">
+<body ng-controller="MapController">
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">PaddleBuddy</a>
         </div>
     </nav>
-    <ui-gmap-google-map center="map.center" zoom="map.zoom" style="height: 400px"></ui-gmap-google-map>
+    <div id="map" class="container"></div>
+    <button id="submitBtn" class="btn btn-default" ng-click="submitData()">Submit</button>
 
 </body>
 </html>

@@ -5,7 +5,7 @@ var mongoose = require('mongoose');
 
 var pointSchema = new mongoose.Schema({
     lat: {type: Number, required: true},
-    long: {type: Number, required: true}
+    lng: {type: Number, required: true}
 });
 
 var Point = mongoose.model('Point', pointSchema);
