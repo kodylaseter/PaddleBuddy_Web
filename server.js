@@ -37,12 +37,14 @@ app.get('/api/points', function(req, res) {
 });
 
 app.post('/api/points', function(req, res) {
-    Point.create({
-        lat: req.body.lat,
-        long: req.body.long
-    }, function(err, point) {
-        if (err) res.send(err);
-    });
+    //for (obj p : req)
+    //Point.create({
+    //    lat: req.body.lat,
+    //    lng: req.body.lng
+    //}, function(err, point) {
+    //    if (err) res.send(err);
+    //});
+    console.log(req);
 });
 
 app.get('*', function(req, res) {
