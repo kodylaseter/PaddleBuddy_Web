@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/map.css">
-    <title>PaddleBuddy Map Data</title>
+    <!--<title>PaddleBuddy Map Data</title>-->
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script><!-- load angular -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBIuCKiNReJwTU4frhP3ndPyvdrZt60pJU">
     </script>
@@ -15,11 +15,15 @@
 <body ng-controller="MapController">
     <nav class="navbar navbar-default">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">PaddleBuddy</a>
+            <!--<a class="navbar-brand" href="#">PaddleBuddy</a>-->
         </div>
     </nav>
     <div id="map" class="container"></div>
-    <button id="submitBtn" class="btn btn-default" ng-click="submitData()">Submit</button>
+    <div class="centered-btns">
+        <button id="submitBtn" class="btn btn-default" ng-click="submitPoints()">Submit</button>
+        <button id="undoBtn" class="btn btn-default" ng-click="undoAddPoint()">Undo</button>
+        <button id="clearBtn" class="btn btn-default" ng-click="clearPoints()">Clear</button>
+    </div>
 
 </body>
 </html>

@@ -12,22 +12,15 @@ pbWeb.controller('MapController', function($scope, $http) {
         zoom: 6,
         center: initLatLng
     };
-
-    var lineCoords = [
-
-    ];
-
+    var riverPath = new google.maps.Polyline();
+    var riverStart = new google.maps.Circle();
+    var lineCoords = [];
     $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
-
-
-
     $scope.map.addListener('rightclick', function(e) {
         var lat = e.latLng.lat();
         var lng = e.latLng.lng();
         addToLine(lat, lng);
-        //addPoint(lat, lng);
     });
-
     $http.get('/api/points')
         .success(function(data) {
             $scope.points = data;
@@ -48,27 +41,46 @@ pbWeb.controller('MapController', function($scope, $http) {
         lineCoords.push({lat: lat, lng: lng});
         refreshLine();
     }
-    function addPoint(lat, lng) {
-        var data = {lat: lat, lng: lng};
-        $http.post('/api/points', data)
-            .success(function(data) {
-                console.log('success!!!');
-            })
-            .error(function(data) {
-                console.log('Error: ');
-            });
-        console.log('add point called');
-    }
     function refreshLine() {
-        var flightPath = new google.maps.Polyline({
-            path: lineCoords,
-            geodesic: true,
-            strokeColor: '#FF0000',
-            strokeOpacity: 1.0,
-            strokeWeight: 2
-        });
-        flightPath.setMap($scope.map);
+        riverPath.setMap(null);
+        riverStart.setMap(null);
+        if (lineCoords.length == 1) {
+            riverStart = new google.maps.Circle({
+                fillColor: '#0000FF',
+                fillOpacity: 0.8,
+                center: lineCoords[0],
+                radius: 50,
+                map: $scope.map
+            });
+        } else {
+            riverPath = new google.maps.Polyline({
+                path: lineCoords,
+                geodesic: true,
+                strokeColor: '#FF0000',
+                strokeOpacity: 1.0,
+                strokeWeight: 2,
+                map: $scope.map
+            });
+        }
     }
-
+    $scope.addPoints = function() {
+        if (lineCoords.length > 0) {
+            $http.post('/api/points', lineCoords)
+                .success(function(data) {
+                    console.log('')
+                })
+                .error(function() {
+                    console.log('error submitted points');
+                });
+        } else console.log('lineCoords length < 1');
+    };
+    $scope.undoAddPoint = function() {
+        lineCoords.pop();
+        refreshLine();
+    };
+    $scope.clearPoints = function() {
+        lineCoords = [];
+        refreshLine();
+    };
 
 });

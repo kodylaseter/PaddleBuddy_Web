@@ -2,7 +2,7 @@
     height: 600px;
 }
 
-#submitBtn {
+.centered-buttons {
     margin: 0 auto;
     display: block;
 }

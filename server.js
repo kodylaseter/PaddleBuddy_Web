@@ -23,28 +23,23 @@ app.set('port', process.env.PORT || 8080);
 //ROUTES
 
 app.get('/api/points', function(req, res) {
-
-    // use mongoose to get all todos in the database
     Point.find(function(err, points) {
         console.log('points get called');
-
-        // if there is an error retrieving, send the error. nothing after res.send(err) will execute
         if (err)
             res.send(err)
-
-        res.json(points); // return all todos in JSON format
+        res.json(points);
     });
 });
 
 app.post('/api/points', function(req, res) {
-    //for (obj p : req)
-    //Point.create({
-    //    lat: req.body.lat,
-    //    lng: req.body.lng
-    //}, function(err, point) {
-    //    if (err) res.send(err);
-    //});
-    console.log(req);
+    for (var i = 0; i < req.body.length; i++) {
+        Point.create({
+            lat: req.body[i].lat,
+            lng: req.body[i].lng
+        }, function(err, point) {
+            if (err) res.send(err);
+        });
+    }
 });
 
 app.get('*', function(req, res) {
