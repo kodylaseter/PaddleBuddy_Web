@@ -13,7 +13,7 @@ pbWeb.controller('MapController', function($scope, $http) {
         center: initLatLng
     };
     var riverPath = new google.maps.Polyline();
-    var riverStart = new google.maps.Circle();
+    var pathPoints = [];
     var lineCoords = [];
     $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
     $scope.map.addListener('rightclick', function(e) {
@@ -39,29 +39,31 @@ pbWeb.controller('MapController', function($scope, $http) {
     };
     function addToLine(lat, lng) {
         lineCoords.push({lat: lat, lng: lng});
+        pathPoints.push(new google.maps.Circle({
+            fillColor: '#0000FF',
+            fillOpacity: 0.8,
+            center: lineCoords[lineCoords.length - 1],
+            radius: 50,
+            map: $scope.map
+        }));
         refreshLine();
     }
     function refreshLine() {
         riverPath.setMap(null);
-        riverStart.setMap(null);
-        if (lineCoords.length == 1) {
-            riverStart = new google.maps.Circle({
-                fillColor: '#0000FF',
-                fillOpacity: 0.8,
-                center: lineCoords[0],
-                radius: 50,
-                map: $scope.map
-            });
-        } else {
-            riverPath = new google.maps.Polyline({
-                path: lineCoords,
-                geodesic: true,
-                strokeColor: '#FF0000',
-                strokeOpacity: 1.0,
-                strokeWeight: 2,
-                map: $scope.map
-            });
+        riverPath = new google.maps.Polyline({
+            path: lineCoords,
+            geodesic: true,
+            strokeColor: '#FF0000',
+            strokeOpacity: 1.0,
+            strokeWeight: 2,
+            map: $scope.map
+        });
+    }
+    function clearPoints() {
+        for (var i = 0; i < pathPoints.length; i++) {
+            pathPoints[i].setMap(null);
         }
+        pathPoints = [];
     }
     $scope.addPoints = function() {
         if (lineCoords.length > 0) {
@@ -74,12 +76,16 @@ pbWeb.controller('MapController', function($scope, $http) {
                 });
         } else console.log('lineCoords length < 1');
     };
-    $scope.undoAddPoint = function() {
-        lineCoords.pop();
-        refreshLine();
+    $scope.removePoint = function() {
+        if (pathPoints.length > 0) {
+            lineCoords.pop();
+            pathPoints.pop().setMap(null);
+            refreshLine();
+        }
     };
     $scope.clearPoints = function() {
         lineCoords = [];
+        clearPoints();
         refreshLine();
     };
 
