@@ -15,19 +15,20 @@ pbWeb.controller('MapController', function($scope, $http) {
     var riverPath = new google.maps.Polyline();
     var pathPoints = [];
     var lineCoords = [];
+    $scope.rivers = [
+        {
+            name: 'test2'
+        },
+        {
+            name: 'testttttt'
+        }
+    ];
     $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
     $scope.map.addListener('rightclick', function(e) {
         var lat = e.latLng.lat();
         var lng = e.latLng.lng();
         addToLine(lat, lng);
     });
-    $http.get('/api/points')
-        .success(function(data) {
-            $scope.points = data;
-        })
-        .error(function(data) {
-            console.log('Error: ' + data);
-        });
     $scope.submitData = function() {
         $http.post('/api/points', lineCoords)
             .success(function() {
@@ -36,6 +37,29 @@ pbWeb.controller('MapController', function($scope, $http) {
             .error(function() {
                 console.log('Error: ');
             });
+    };
+    $scope.addPoints = function() {
+        if (lineCoords.length > 0) {
+            $http.post('/api/points', lineCoords)
+                .success(function(data) {
+                    console.log('')
+                })
+                .error(function() {
+                    console.log('error submitting points');
+                });
+        } else console.log('lineCoords length < 1');
+    };
+    $scope.removePoint = function() {
+        if (pathPoints.length > 0) {
+            lineCoords.pop();
+            pathPoints.pop().setMap(null);
+            refreshLine();
+        }
+    };
+    $scope.clearPoints = function() {
+        lineCoords = [];
+        clearPoints();
+        refreshLine();
     };
     function addToLine(lat, lng) {
         lineCoords.push({lat: lat, lng: lng});
@@ -65,28 +89,5 @@ pbWeb.controller('MapController', function($scope, $http) {
         }
         pathPoints = [];
     }
-    $scope.addPoints = function() {
-        if (lineCoords.length > 0) {
-            $http.post('/api/points', lineCoords)
-                .success(function(data) {
-                    console.log('')
-                })
-                .error(function() {
-                    console.log('error submitted points');
-                });
-        } else console.log('lineCoords length < 1');
-    };
-    $scope.removePoint = function() {
-        if (pathPoints.length > 0) {
-            lineCoords.pop();
-            pathPoints.pop().setMap(null);
-            refreshLine();
-        }
-    };
-    $scope.clearPoints = function() {
-        lineCoords = [];
-        clearPoints();
-        refreshLine();
-    };
 
 });

@@ -19,5 +19,14 @@
     "method-override": "^2.3.5",
     "mongoose": "^4.3.5",
     "morgan": "^1.6.1"
+  },
+  "devDependencies": {
+    "connect-livereload": "^0.5.4",
+    "gulp": "^3.9.0",
+    "gulp-live-server": "0.0.29",
+    "gulp-sass": "^2.1.1",
+    "gulp-util": "^3.0.7",
+    "path": "^0.12.7",
+    "tiny-lr": "^0.2.1"
   }
 }

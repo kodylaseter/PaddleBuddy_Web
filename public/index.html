@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/map.css">
+    <link rel="stylesheet" href="/css/main.css">
     <title>PaddleBuddy Map Data</title>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script><!-- load angular -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBIuCKiNReJwTU4frhP3ndPyvdrZt60pJU">
@@ -18,14 +18,29 @@
             <a class="navbar-brand" href="#">PaddleBuddy</a>
         </div>
     </nav>
-    <div class="row">
-        <div id="map" class="container"></div>
-    </div>
-    <div class="row" style="text-align: center">
-        <div class="btn-group" role="group">
-            <button id="submitBtn" class="btn btn-default" ng-click="addPoints()">Submit</button>
-            <button id="undoBtn" class="btn btn-default" ng-click="removePoint()">Undo</button>
-            <button id="clearBtn" class="btn btn-default" ng-click="clearPoints()">Clear</button>
+    <div class="container">
+        <div class="row">
+            <div id="map" class="col-xs-9"></div>
+            <div id="riverList" class="col-xs-3" ng-repeat="river in rivers">
+                <label>{{ river.name }}</label>
+            </div>
+            <div id="riverForm" class="col-xs-3">
+                <div class="input-group">
+                    <input type="text" class="form-control"
+                           placeholder="river name" ng-model="riverName">
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary" ng-click="addRiver()">Submit</button>
+                    </span>
+                </div>
+            </div>
+
+        </div>
+        <div class="row row-center col-xs-9">
+            <div class="btn-group" role="group">
+                <button id="submitBtn" class="btn btn-primary" ng-click="addPoints()">Submit</button>
+                <button id="undoBtn" class="btn btn-default" ng-click="removePoint()">Undo</button>
+                <button id="clearBtn" class="btn btn-default" ng-click="clearPoints()">Clear</button>
+            </div>
         </div>
     </div>
 </body>
