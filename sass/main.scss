@@ -1,5 +1,38 @@
+$teal: #009688;
+$teal-dark: #00695C;
+$teal-light: #80CBC4;
+$teal-lightish: #4DB6AC;
+$light-grey: #FAFAFA;
+
 #map {
   height: 600px;
+}
+
+#main {
+  margin-top: 70px;
+}
+
+.navbar-custom {
+  background-color: $teal;
+  border-color: $teal-dark;
+}
+
+.navbar-custom .navbar-brand {
+  color: $light-grey;
+}
+
+.list-group {
+  padding-left: 15px;
+}
+
+.list-group-item.active {
+   background-color: $teal-light;
+   border-color: $teal-lightish;
+ }
+
+.list-group-item.active:hover {
+  background-color: $teal-lightish;
+  border-color: $teal;
 }
 
 div.btn-group {
@@ -9,4 +42,14 @@ div.btn-group {
 
 div.row-center {
   text-align: center;
+}
+
+.btn-primary, .btn-primary:active, .btn-primary:focus {
+  background-color: $teal-light;
+  border-color: $teal-lightish;
+}
+
+.btn-primary:hover {
+  background-color: $teal-lightish;
+  border-color: $teal;
 }
