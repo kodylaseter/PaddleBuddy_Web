@@ -15,14 +15,19 @@ pbWeb.controller('MapController', function($scope, $http) {
     var riverPath = new google.maps.Polyline();
     var pathPoints = [];
     var lineCoords = [];
-    $scope.rivers = [
-        {
-            name: 'test2'
-        },
-        {
-            name: 'testttttt'
-        }
-    ];
+    $http.get('/api/rivers')
+        .success(function(data) {
+            console.log(data);
+            //$scope.rivers = data;
+        })
+        .error(function() {
+            console.log('error getting rivers');
+        });
+    $scope.idSelectedRiver = null;
+    $scope.setSelected = function (idRiver) {
+        $scope.idSelectedRiver = idRiver;
+    };
+
     $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
     $scope.map.addListener('rightclick', function(e) {
         var lat = e.latLng.lat();
@@ -88,6 +93,10 @@ pbWeb.controller('MapController', function($scope, $http) {
             pathPoints[i].setMap(null);
         }
         pathPoints = [];
+    }
+
+    $scope.addRiver = function() {
+        $scope.rivers.push($scope.riverName);
     }
 
 });

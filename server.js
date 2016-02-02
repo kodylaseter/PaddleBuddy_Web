@@ -7,11 +7,13 @@ var bodyParser = require('body-parser');    // pull information from HTML POST (
 var methodOverride = require('method-override'); // simulate DELETE and PUT (express4)
 var http = require('http');
 var Point = require('./public/models/point');
+var River = require('./public/models/river');
 
 // configuration =================
 
 mongoose.connect('mongodb://kodylaseter:manhunt1@ds047712.mongolab.com:47712/pbdb');     // connect to mongoDB database
 
+app.use(require('connect-livereload')({port: 35729}));
 app.use(express.static(__dirname + '/public'));                 // set the static files location /public/img will be /img for users
 app.use(morgan('dev'));                                         // log every request to the console
 app.use(bodyParser.urlencoded({'extended':'true'}));            // parse application/x-www-form-urlencoded
@@ -21,14 +23,17 @@ app.use(methodOverride());
 app.set('port', process.env.PORT || 8080);
 
 //ROUTES
-
 app.get('/api/points', function(req, res) {
     Point.find(function(err, points) {
         console.log('points get called');
         if (err)
-            res.send(err)
+            res.send(err);
         res.json(points);
     });
+});
+
+app.get('/api/rivers', function(req, res) {
+    res.send('rivers');
 });
 
 app.post('/api/points', function(req, res) {
@@ -48,5 +53,5 @@ app.get('*', function(req, res) {
 
 
 //launch server--------------------------------------------
-app.listen(8080);
-console.log("App listening on port 8080");
+app.listen(4000, '0.0.0.0');
+console.log("App listening on port 4000");
