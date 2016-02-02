@@ -23,9 +23,10 @@
     <div id="main" class="container">
         <div class="row">
             <div id="map" class="col-xs-9"></div>
-            <div id="riverList" class="col-xs-3" ng-repeat="river in rivers">
-                <label>{{ river.name }}</label>
-            </div>
+            <ul id="riverList" class="col-xs-3 list-group">
+                <li class="list-group-item" ng-repeat="river in rivers"
+                    ng-click="setSelected(river.id)" ng-class="{selected: river.id === idSelectedRiver}">{{ river }}</li>
+            </ul>
             <div id="riverForm" class="col-xs-3">
                 <div class="input-group">
                     <input type="text" class="form-control"
