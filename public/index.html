@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/dist/angular-list-group.css">
     <title>PaddleBuddy Map Data</title>
     <script src="/dist/angular.min.js"></script><!-- load angular -->
     <script src="/dist/jquery-1.12.0.min.js"></script>
@@ -24,15 +23,15 @@
         <div class="row">
             <div id="map" class="col-xs-9"></div>
             <ul id="riverList" class="col-xs-3 list-group">
-                <li class="list-group-item" ng-repeat="river in rivers"
-                    ng-click="setSelected(river.id)" ng-class="{selected: river.id === idSelectedRiver}">{{ river }}</li>
+                <li class="list-group-item river-item" ng-repeat="river in rivers"
+                    ng-click="setSelected(river.id)" ng-class="{selected: river.id === idSelectedRiver}">{{ river.name }}</li>
             </ul>
             <div id="riverForm" class="col-xs-3">
                 <div class="input-group">
-                    <input type="text" class="form-control"
+                    <input type="text" class="form-control" style="text-align: center"
                            placeholder="river name" ng-model="riverName">
                     <span class="input-group-btn">
-                        <button class="btn btn-primary" ng-click="addRiver()">Submit</button>
+                        <button class="btn btn-primary" ng-click="addRiver()">Add</button>
                     </span>
                 </div>
             </div>

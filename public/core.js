@@ -1,10 +1,4 @@
 var pbWeb = angular.module('pbWeb', []);
-    //.config(function(uiGmapGoogleMapApiProvider) {
-    //    uiGmapGoogleMapApiProvider.configure({
-    //        key: 'AIzaSyBIuCKiNReJwTU4frhP3ndPyvdrZt60pJU',
-    //        //libraries: 'weather,geometry,visualization'
-    //    });
-    //});
 
 pbWeb.controller('MapController', function($scope, $http) {
     var initLatLng = new google.maps.LatLng(33.7550,-84.3900);
@@ -15,25 +9,51 @@ pbWeb.controller('MapController', function($scope, $http) {
     var riverPath = new google.maps.Polyline();
     var pathPoints = [];
     var lineCoords = [];
-    $http.get('/api/rivers')
-        .success(function(data) {
-            console.log(data);
-            //$scope.rivers = data;
-        })
-        .error(function() {
-            console.log('error getting rivers');
-        });
-    $scope.idSelectedRiver = null;
-    $scope.setSelected = function (idRiver) {
-        $scope.idSelectedRiver = idRiver;
+
+    //region Rivers
+    $scope.rivers = [];
+    function getRivers() {
+        $http.get('/api/rivers')
+            .success(function(data) {
+                $scope.rivers = data;
+            })
+            .error(function() {
+                console.log('error getting rivers');
+            });
+        $scope.idSelectedRiver = null;
+        $scope.setSelected = function (idRiver) {
+            $scope.idSelectedRiver = idRiver;
+        };
+    }
+    getRivers();
+    $scope.addRiver = function() {
+        if ($scope.riverName != '') {
+            var river = {
+                name: $scope.riverName
+            };
+            $http.post('/api/rivers', river)
+                .success(function (data) {
+                    getRivers();
+                    $scope.riverName = '';
+                })
+                .error(function () {
+                    console.log('error posting new river')
+                });
+        }
     };
 
+    //endregion
+
+    //region Map
     $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
     $scope.map.addListener('rightclick', function(e) {
         var lat = e.latLng.lat();
         var lng = e.latLng.lng();
         addToLine(lat, lng);
     });
+    //endregion
+
+    //region Points
     $scope.submitData = function() {
         $http.post('/api/points', lineCoords)
             .success(function() {
@@ -47,7 +67,7 @@ pbWeb.controller('MapController', function($scope, $http) {
         if (lineCoords.length > 0) {
             $http.post('/api/points', lineCoords)
                 .success(function(data) {
-                    console.log('')
+
                 })
                 .error(function() {
                     console.log('error submitting points');
@@ -66,6 +86,9 @@ pbWeb.controller('MapController', function($scope, $http) {
         clearPoints();
         refreshLine();
     };
+    //endregion
+
+    //region Line
     function addToLine(lat, lng) {
         lineCoords.push({lat: lat, lng: lng});
         pathPoints.push(new google.maps.Circle({
@@ -94,9 +117,5 @@ pbWeb.controller('MapController', function($scope, $http) {
         }
         pathPoints = [];
     }
-
-    $scope.addRiver = function() {
-        $scope.rivers.push($scope.riverName);
-    }
-
+    //endregion
 });

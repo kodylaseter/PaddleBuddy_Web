@@ -4,7 +4,7 @@
 var mongoose = require('mongoose');
 
 var riverSchema = new mongoose.Schema({
-    name: {type: Number, required: true}
+    name: {type: String, required: true}
 });
 
 var River = mongoose.model('River', riverSchema);

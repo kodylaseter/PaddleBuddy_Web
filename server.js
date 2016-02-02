@@ -23,6 +23,23 @@ app.use(methodOverride());
 app.set('port', process.env.PORT || 8080);
 
 //ROUTES
+
+app.get('/api/rivers', function(req, res) {
+    River.find(function(err, rivers) {
+        if (err) res.send(err);
+        res.send(rivers);
+    });
+});
+
+app.post('/api/rivers', function(req, res) {
+    River.create({
+        name: req.body.name
+    }, function(err, river) {
+        if (err) res.send('error');
+        res.send('su');
+    });
+});
+
 app.get('/api/points', function(req, res) {
     Point.find(function(err, points) {
         console.log('points get called');
@@ -30,10 +47,6 @@ app.get('/api/points', function(req, res) {
             res.send(err);
         res.json(points);
     });
-});
-
-app.get('/api/rivers', function(req, res) {
-    res.send('rivers');
 });
 
 app.post('/api/points', function(req, res) {
@@ -51,7 +64,13 @@ app.get('*', function(req, res) {
     res.sendFile(__dirname + '/public/index.html');
 });
 
-
 //launch server--------------------------------------------
 app.listen(4000, '0.0.0.0');
 console.log("App listening on port 4000");
+
+River.create({
+    name: 'test'
+}, function(err, river) {
+    if (err) console.log(err);
+    else console.log(river);
+});

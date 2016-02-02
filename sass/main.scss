@@ -21,7 +21,7 @@ $light-grey: #FAFAFA;
   color: $light-grey;
 }
 
-.list-group {
+#riverList {
   padding-left: 15px;
 }
 
@@ -33,6 +33,10 @@ $light-grey: #FAFAFA;
 .list-group-item.active:hover {
   background-color: $teal-lightish;
   border-color: $teal;
+}
+
+.river-item {
+  text-align: center;
 }
 
 div.btn-group {

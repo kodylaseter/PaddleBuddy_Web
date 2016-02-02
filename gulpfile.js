@@ -15,8 +15,6 @@ var sass = require('gulp-sass');
 
 'use strict';
 
-require('./test.js');
-
 // configuration =================
 
 gulp.task('express', function() {
@@ -49,7 +47,9 @@ gulp.task('sass', function () {
 gulp.task('watch', function() {
     gulp.watch('./sass/**/*.scss', ['sass']);
     gulp.watch('public/**/*.css', notifyLiveReload);
+    gulp.watch('public/**/*.js', notifyLiveReload);
     gulp.watch('public/**/*.html', notifyLiveReload);
+    gulp.watch('./*.js', ['express']);
 });
 
 gulp.task('default', ['express', 'livereload', 'watch', 'sass'], function() {
