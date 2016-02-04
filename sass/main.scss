@@ -4,8 +4,10 @@ $teal-light: #80CBC4;
 $teal-lightish: #4DB6AC;
 $light-grey: #FAFAFA;
 
+$mapHeight: 600px;
+
 #map {
-  height: 600px;
+  height: $mapHeight;
 }
 
 #main {
@@ -21,8 +23,8 @@ $light-grey: #FAFAFA;
   color: $light-grey;
 }
 
-#riverList {
-  padding-left: 15px;
+.list-group {
+  margin-bottom: 10px;
 }
 
 .list-group-item.active {
@@ -37,6 +39,18 @@ $light-grey: #FAFAFA;
 
 .river-item {
   text-align: center;
+}
+
+#riverWell {
+  height: $mapHeight;
+  overflow: auto;
+  margin-bottom: 10px;
+}
+
+li.selected {
+  background-color: $teal-light;
+  border-color: $teal-lightish;
+  color: #fff;
 }
 
 div.btn-group {

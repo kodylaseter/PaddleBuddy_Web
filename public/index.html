@@ -21,27 +21,30 @@
     </nav>
     <div id="main" class="container">
         <div class="row">
-            <div id="map" class="col-xs-9"></div>
-            <ul id="riverList" class="col-xs-3 list-group">
-                <li class="list-group-item river-item" ng-repeat="river in rivers"
-                    ng-click="setSelected(river.id)" ng-class="{selected: river.id === idSelectedRiver}">{{ river.name }}</li>
-            </ul>
-            <div id="riverForm" class="col-xs-3">
-                <div class="input-group">
+            <div id="mapGroup" class="col-sm-9 col-xs-12" style="margin-bottom: 10px;">
+                <div id="map"></div>
+                <div class="row-center">
+                    <div class="btn-group" role="group">
+                        <button id="submitBtn" class="btn btn-primary" ng-click="addPoints()">Submit</button>
+                        <button id="undoBtn" class="btn btn-default" ng-click="removePoint()">Undo</button>
+                        <button id="clearBtn" class="btn btn-default" ng-click="clearPoints()">Clear</button>
+                    </div>
+                </div>
+            </div>
+            <div id="riverGroup" class=" row-center col-sm-3 col-xs-12">
+                <div id="riverWell" class="well">
+                    <ul id="riverList" class="list-group">
+                        <li class="list-group-item river-item" ng-repeat="river in rivers"
+                            ng-click="setSelected($index)" ng-class="{selected: $index == idSelectedRiver}">{{ river.name }}</li>
+                    </ul>
+                </div>
+                <div id="riverForm" class="input-group">
                     <input type="text" class="form-control" style="text-align: center"
                            placeholder="river name" ng-model="riverName">
                     <span class="input-group-btn">
                         <button class="btn btn-primary" ng-click="addRiver()">Add</button>
                     </span>
                 </div>
-            </div>
-
-        </div>
-        <div class="row row-center col-xs-9">
-            <div class="btn-group" role="group">
-                <button id="submitBtn" class="btn btn-primary" ng-click="addPoints()">Submit</button>
-                <button id="undoBtn" class="btn btn-default" ng-click="removePoint()">Undo</button>
-                <button id="clearBtn" class="btn btn-default" ng-click="clearPoints()">Clear</button>
             </div>
         </div>
     </div>

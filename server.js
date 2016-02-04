@@ -67,10 +67,3 @@ app.get('*', function(req, res) {
 //launch server--------------------------------------------
 app.listen(4000, '0.0.0.0');
 console.log("App listening on port 4000");
-
-River.create({
-    name: 'test'
-}, function(err, river) {
-    if (err) console.log(err);
-    else console.log(river);
-});

@@ -20,10 +20,7 @@ pbWeb.controller('MapController', function($scope, $http) {
             .error(function() {
                 console.log('error getting rivers');
             });
-        $scope.idSelectedRiver = null;
-        $scope.setSelected = function (idRiver) {
-            $scope.idSelectedRiver = idRiver;
-        };
+
     }
     getRivers();
     $scope.addRiver = function() {
@@ -40,6 +37,11 @@ pbWeb.controller('MapController', function($scope, $http) {
                     console.log('error posting new river')
                 });
         }
+    };
+
+    $scope.idSelectedRiver = null;
+    $scope.setSelected = function (riverIndex) {
+        $scope.idSelectedRiver = riverIndex;
     };
 
     //endregion
