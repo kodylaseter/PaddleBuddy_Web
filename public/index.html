@@ -5,48 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/main.css">
-    <title>PaddleBuddy Map Data</title>
-    <script src="/dist/angular.min.js"></script><!-- load angular -->
+    <title>PaddleBuddy</title>
+    <script src="/dist/angular.min.js"></script>
+    <script src="/dist/angular-route.min.js"></script>
     <script src="/dist/jquery-1.12.0.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBIuCKiNReJwTU4frhP3ndPyvdrZt60pJU">
     </script>
-    <script src="core.js"></script>
+    <script src="js/main.js"></script>
 
 </head>
-<body ng-controller="MapController">
+<body ng-controller="mainController">
     <nav class="navbar navbar-inverse navbar-fixed-top navbar-custom">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">PaddleBuddy</a>
+            <a class="navbar-brand" href="">PaddleBuddy</a>
         </div>
+        <ul class="nav navbar-nav navbar-right">
+            <li> <a href=""> <i class="fa fa-home"></i> Home </a> </li>
+            <li> <a href="#map"> <i class="fa fa-shield"></i> Map </a> </li>
+        </ul>
     </nav>
-    <div id="main" class="container">
-        <div class="row">
-            <div id="mapGroup" class="col-sm-9 col-xs-12" style="margin-bottom: 10px;">
-                <div id="map"></div>
-                <div class="row-center">
-                    <div class="btn-group" role="group">
-                        <button id="submitBtn" class="btn btn-primary" ng-click="addPoints()">Submit</button>
-                        <button id="undoBtn" class="btn btn-default" ng-click="removePoint()">Undo</button>
-                        <button id="clearBtn" class="btn btn-default" ng-click="clearPoints()">Clear</button>
-                    </div>
-                </div>
-            </div>
-            <div id="riverGroup" class=" row-center col-sm-3 col-xs-12">
-                <div id="riverWell" class="well">
-                    <ul id="riverList" class="list-group">
-                        <li class="list-group-item river-item" ng-repeat="river in rivers"
-                            ng-click="setSelected($index)" ng-class="{selected: $index == idSelectedRiver}">{{ river.name }}</li>
-                    </ul>
-                </div>
-                <div id="riverForm" class="input-group">
-                    <input type="text" class="form-control" style="text-align: center"
-                           placeholder="river name" ng-model="riverName">
-                    <span class="input-group-btn">
-                        <button class="btn btn-primary" ng-click="addRiver()">Add</button>
-                    </span>
-                </div>
-            </div>
-        </div>
+    <div id="main">
+        <div ng-view></div>
     </div>
 </body>
 </html>
