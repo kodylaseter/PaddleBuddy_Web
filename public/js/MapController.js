@@ -1,6 +1,4 @@
-var pbWeb = angular.module('pbWeb', []);
-
-pbWeb.controller('MapController', function($scope, $http) {
+pbWeb.controller('mapController', function($scope, $http) {
     var initLatLng = new google.maps.LatLng(33.7550,-84.3900);
     var mapOptions = {
         zoom: 6,
@@ -44,6 +42,10 @@ pbWeb.controller('MapController', function($scope, $http) {
         $scope.idSelectedRiver = riverIndex;
     };
 
+    function getSelectedRiverId() {
+        return $scope.rivers[$scope.idSelectedRiver]._id;
+    }
+
     //endregion
 
     //region Map
@@ -56,25 +58,19 @@ pbWeb.controller('MapController', function($scope, $http) {
     //endregion
 
     //region Points
-    $scope.submitData = function() {
-        $http.post('/api/points', lineCoords)
-            .success(function() {
-                console.log('success!!!');
-            })
-            .error(function() {
-                console.log('Error: ');
-            });
-    };
     $scope.addPoints = function() {
-        if (lineCoords.length > 0) {
-            $http.post('/api/points', lineCoords)
-                .success(function(data) {
+        if ($scope.idSelectedRiver != null) {
+            if (lineCoords.length > 0) {
+                $http.post('/api/points', lineCoords)
+                    .success(function(data) {
 
-                })
-                .error(function() {
-                    console.log('error submitting points');
-                });
-        } else console.log('lineCoords length < 1');
+                    })
+                    .error(function() {
+                        console.log('error submitting points');
+                    });
+            } else showToast('error', "No points added!");
+        } else showToast('error', "No river selected!");
+
     };
     $scope.removePoint = function() {
         if (pathPoints.length > 0) {
@@ -118,6 +114,20 @@ pbWeb.controller('MapController', function($scope, $http) {
             pathPoints[i].setMap(null);
         }
         pathPoints = [];
+    }
+    //endregion
+
+    //region Toast
+    function showToast(type, text) {
+        if (type == 'warning') {
+            $('#toast').css('background-color', '#EF6C00')
+        } else if (type == 'error') {
+            $('#toast').css('background-color', '#EF5350')
+        } else if (type == 'success') {
+            $('#toast').css('background-color', '#4DB6AC')
+        }
+        $('#toast').text(text);
+        $('#toast').fadeIn(400).delay(2000).fadeOut(400);
     }
     //endregion
 });
