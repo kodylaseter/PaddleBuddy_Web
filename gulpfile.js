@@ -2,26 +2,29 @@
  * Created by klaseter3-gtri on 1/29/2016.
  */
 var gulp = require('gulp');
-var express  = require('express');
-var app      = express();                               // create our app w/ express
 var mongoose = require('mongoose');                     // mongoose for mongodb
 var morgan = require('morgan');             // log requests to the console (express4)
 var bodyParser = require('body-parser');    // pull information from HTML POST (express4)
 var methodOverride = require('method-override'); // simulate DELETE and PUT (express4)
-var http = require('http');
-var Point = require('./public/models/point');
-var River = require('./public/models/river');
 var sass = require('gulp-sass');
-
+var nodemon = require('gulp-nodemon');
+var tinylr;
 'use strict';
 
 // configuration =================
 
 gulp.task('express', function() {
-    require('./server.js');
+    nodemon({ script: 'server.js'
+        , ext: 'js'
+        , ignore: ['public/**/*.js']})
+        .on('restart', function () {
+            notifyLiveReload({
+                type: 'changed',
+                path: './public/index.html'
+            });
+        })
 });
 
-var tinylr;
 gulp.task('livereload', function() {
     tinylr = require('tiny-lr')();
     tinylr.listen(35729);
@@ -49,7 +52,6 @@ gulp.task('watch', function() {
     gulp.watch('public/**/*.css', notifyLiveReload);
     gulp.watch('public/**/*.js', notifyLiveReload);
     gulp.watch('public/**/*.html', notifyLiveReload);
-    gulp.watch('./*.js', ['express']);
 });
 
 gulp.task('default', ['express', 'livereload', 'watch', 'sass'], function() {

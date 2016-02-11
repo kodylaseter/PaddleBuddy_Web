@@ -26,15 +26,17 @@ pbWeb.controller('mapController', function($scope, $http) {
         center: initLatLng
     };
     var riverPath = new google.maps.Polyline();
-    var pathPoints = [];
     var lineCoords = [];
+    var modifying = 0;
 
     //region Rivers
     $scope.rivers = [];
     function getRivers() {
+        modifying = 1;
         $http.get('/api/rivers')
             .success(function(data) {
                 $scope.rivers = data;
+                modifying = 0;
             })
             .error(function() {
                 console.log('error getting rivers');
@@ -44,6 +46,7 @@ pbWeb.controller('mapController', function($scope, $http) {
     getRivers();
     $scope.addRiver = function() {
         if ($scope.riverName != '') {
+            modifying = 1;
             var river = {
                 name: $scope.riverName
             };
@@ -51,6 +54,7 @@ pbWeb.controller('mapController', function($scope, $http) {
                 .success(function (data) {
                     getRivers();
                     $scope.riverName = '';
+                    modifying = 0;
                 })
                 .error(function () {
                     console.log('error posting new river')
@@ -61,7 +65,7 @@ pbWeb.controller('mapController', function($scope, $http) {
     $scope.idSelectedRiver = null;
     $scope.setSelected = function (riverIndex) {
         $scope.idSelectedRiver = riverIndex;
-        initLine(getSelectedRiverId());
+        refresh();
     };
 
     function getSelectedRiverId() {
@@ -73,87 +77,69 @@ pbWeb.controller('mapController', function($scope, $http) {
     //region Map
     $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
     $scope.map.addListener('rightclick', function(e) {
-        var lat = e.latLng.lat();
-        var lng = e.latLng.lng();
-        addToLine(lat, lng);
+        if (modifying) {
+            showToast('error', 'Modifying database, try again');
+        } else {
+            if ($scope.idSelectedRiver == null) {
+                showToast('error', 'Select a river first!');
+            } else {
+                var lat = e.latLng.lat();
+                var lng = e.latLng.lng();
+                addPoint(lat, lng, getSelectedRiverId());
+            }
+        }
     });
     //endregion
 
     //region Points
-    $scope.addPoints = function() {
-        if ($scope.idSelectedRiver != null) {
-            if (lineCoords.length > 0) {
-                $http.post('/api/points', lineCoords)
+    function addPoint(lat, lng, id) {
+        if (modifying) showToast('error', 'Modifying database, try again')
+        else {
+            if ($scope.idSelectedRiver == null) showToast('error', "Select a river first!");
+            else {
+                modifying = 1;
+                var data = {
+                    lat: lat,
+                    lng: lng,
+                    river_id: id
+                };
+                $http.post('/api/points', data)
                     .success(function(data) {
-
+                        console.log("point success");
+                        modifying = 0;
+                        refresh();
                     })
-                    .error(function() {
-                        console.log('error submitting points');
+                    .error(function () {
+                        console.log('error submitting point')
                     });
-            } else showToast('error', "No points added!");
-        } else showToast('error', "No river selected!");
-
-    };
-    $scope.removePoint = function() {
-        if (pathPoints.length > 0) {
-            lineCoords.pop();
-            pathPoints.pop().setMap(null);
-            refreshLine();
+            }
         }
-    };
-    $scope.clearPoints = function() {
-        lineCoords = [];
-        clearPoints();
-        refreshLine();
-    };
+    }
     //endregion
 
     //region Line
-    function addToLine(lat, lng) {
-        if ($scope.idSelectedRiver == null) showToast('error', "Select a river first!");
-        else {
-            lineCoords.push({lat: lat, lng: lng, river_id: getSelectedRiverId()});
-            pathPoints.push(new google.maps.Circle({
-                fillColor: '#0000FF',
-                fillOpacity: 0.8,
-                center: lineCoords[lineCoords.length - 1],
-                radius: 50,
-                map: $scope.map
-            }));
-            refreshLine();
-        }
-    }
-    function refreshLine() {
-        console.log('refresh');
-        riverPath.setMap(null);
-        riverPath = new google.maps.Polyline({
-            path: lineCoords,
-            geodesic: true,
-            strokeColor: '#FF0000',
-            strokeOpacity: 1.0,
-            strokeWeight: 2,
-            map: $scope.map
-        });
-    }
 
-    function initLine(id) {
-        console.log('init');
-        $http.get('/api/points/' + id)
-            .success(function(data) {
-                console.log(data);
+    function refresh() {
+        modifying = 1;
+        console.log('refresh');
+        $http.get('/api/points/' + getSelectedRiverId())
+            .success( function(data) {
                 lineCoords = data;
-                refreshLine();
+                riverPath.setMap(null);
+                riverPath = new google.maps.Polyline({
+                    path: lineCoords,
+                    geodesic: true,
+                    strokeColor: '#E57373',
+                    strokeOpacity: 1.0,
+                    strokeWeight: 2,
+                    map: $scope.map
+                });
+                modifying = 0;
             })
-            .error(function(error) {
-                console.log(error);
+            .error( function() {
+                showToast('error', 'Error refreshing data')
             });
-        console.log(lineCoords);
-    }
-    function clearPoints() {
-        for (var i = 0; i < pathPoints.length; i++) {
-            pathPoints[i].setMap(null);
-        }
-        pathPoints = [];
+
     }
     //endregion
 

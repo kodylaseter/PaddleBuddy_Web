@@ -11,7 +11,7 @@ $mapHeight: 600px;
 }
 
 #main {
-  margin-top: 70px;
+  margin: 70px 10px 0px 10px;
 }
 
 .navbar-custom {
@@ -21,6 +21,7 @@ $mapHeight: 600px;
 
 .navbar-custom .navbar-brand {
   color: $light-grey;
+
 }
 
 .list-group {
@@ -87,9 +88,9 @@ div.row-center {
   padding:10px;
   text-align:center;
   border-radius: 2px;
-  -webkit-box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);
-  -moz-box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);
-  box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);
+  -webkit-box-shadow: 0px 0px 24px -1px rgba(16, 16, 16, 0.4);
+  -moz-box-shadow: 0px 0px 24px -1px rgba(16, 16, 16, 0.4);
+  box-shadow: 0px 0px 24px -1px rgba(16, 16, 16, 0.4);
 }
 
 .white {

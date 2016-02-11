@@ -15,10 +15,10 @@ var mysql = require('mysql');
 //mongoose.connect('mongodb://kodylaseter:manhunt1@ds047712.mongolab.com:47712/pbdb');     // connect to mongoDB database
 
 var connection = mysql.createConnection({
-    host: '127.0.0.1',
-    user: 'root',
+    host: 'www.db4free.net',
+    user: 'kodylaseter',
     password: 'password',
-    database: 'pb'
+    database: 'pb_test'
 });
 
 app.use(require('connect-livereload')({port: 35729}));
@@ -32,14 +32,6 @@ app.set('port', process.env.PORT || 8080);
 
 //ROUTES
 
-//connection.connect();
-//connection.query('SELECT * from point', function(error, rows, fields) {
-//    if (!error) console.log(rows);
-//    else console.log(error);
-//});
-//
-//connection.end();
-
 app.get('/api/rivers', function(req, res) {
     connection.query('SELECT * from river', function(error, rows, fields) {
         if (error) console.log(error);
@@ -52,25 +44,29 @@ app.get('/api/rivers', function(req, res) {
 app.post('/api/rivers', function(req, res) {
     var data = JSON.parse(JSON.stringify(req.body));
     connection.query('INSERT INTO river SET ?', data, function(error) {
-        if (error) console.log(err);
-        else res.send('success');
+        if (error) console.log('error');
+        else {
+            console.log('success');
+            res.send('success');
+        }
     })
 });
 
-app.get('/api/points', function(req, res) {
-    connection.query('SELECT * from point', function(error, rows, fields) {
-        if (error) console.log(error);
-        else {
-            res.send(JSON.stringify(rows));
-        }
-    });
-});
+//app.get('/api/points', function(req, res) {
+//    connection.query('SELECT * from point', function(error, rows, fields) {
+//        if (error) console.log(error);
+//        else {
+//            res.send(JSON.stringify(rows));
+//        }
+//    });
+//});
 
 app.get('/api/points/:river_id', function(req, res) {
-    var id = req.params.river_id;
-    connection.query('SELECT * FROM point where river_id = ?;', id, function(error, rows) {
+    console.log(req.params.river_id);
+    connection.query('SELECT * FROM point where river_id = ?;', req.params.river_id, function(error, rows, fields) {
         if (error) console.log(error);
         else {
+            console.log(rows);
             res.send(JSON.stringify(rows));
         }
     });
@@ -78,36 +74,19 @@ app.get('/api/points/:river_id', function(req, res) {
 
 app.post('/api/points', function(req, res) {
     var data = JSON.parse(JSON.stringify(req.body));
+    console.log(data);
     for (var i = 0; i < data.length; i++) {
         connection.query('INSERT INTO point SET ?', data[i], function(error) {
             if (error) console.log('error');
         });
     }
 });
-//
-//app.get('/api/points', function(req, res) {
-//    Point.find(function(err, points) {
-//        console.log('points get called');
-//        if (err)
-//            res.send(err);
-//        res.json(points);
-//    });
-//});
-//
-//app.post('/api/points', function(req, res) {
-//    for (var i = 0; i < req.body.length; i++) {
-//        Point.create({
-//            lat: req.body[i].lat,
-//            lng: req.body[i].lng
-//        }, function(err, point) {
-//            if (err) res.send(err);
-//        });
-//    }
-//});
-//
-//app.get('*', function(req, res) {
-//    res.sendFile(__dirname + '/public/index.html');
-//});
+
+app.delete('/api/points/:point_id', function(req, res) {
+    connection.query('DELETE FROM point where id = ?', req.params.point_id, function(error, rows) {
+        if (err) console.log(err);
+    })
+});
 
 //launch server--------------------------------------------
 app.listen(4000, '0.0.0.0');

@@ -1,11 +1,11 @@
-CREATE TABLE `pb`.`point` (
+CREATE TABLE `pb_test`.`point` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `lat` DECIMAL(10,7) NOT NULL,
   `lng` DECIMAL(10,7) NOT NULL,
   `river_id` INT NOT NULL,
   PRIMARY KEY (`id`));
 
-CREATE TABLE `pb`.`river` (
+CREATE TABLE `pb_test`.`river` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`));
