@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/main.css">
-    <title>PaddleBuddy</title>
+    <!--<title>PaddleBuddy</title>-->
     <script src="/dist/angular.min.js"></script>
     <script src="/dist/angular-route.min.js"></script>
     <script src="/dist/jquery-1.12.0.min.js"></script>
@@ -17,15 +17,16 @@
 <body ng-controller="mainController">
     <nav class="navbar navbar-inverse navbar-fixed-top navbar-custom">
         <div class="container-fluid">
-            <a class="navbar-brand" href="">PaddleBuddy</a>
+            <a class="navbar-brand" href="/">Home</a>
         </div>
         <ul class="nav navbar-nav navbar-right">
-            <li> <a href=""> <i class="fa fa-home"></i> Home </a> </li>
-            <li> <a href="#map"> <i class="fa fa-shield"></i> Map </a> </li>
+            <li> <a href="#/"> <i class="glyphicon glyphicon-home white"></i> </a> </li>
+            <li> <a href="#map"> <i class="glyphicon glyphicon-globe white"></i> </a> </li>
         </ul>
     </nav>
     <div id="main">
         <div ng-view></div>
     </div>
+    <div id="toast" style="display: none"></div>
 </body>
 </html>

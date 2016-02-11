@@ -18,7 +18,8 @@
     "express": "^4.13.3",
     "method-override": "^2.3.5",
     "mongoose": "^4.3.5",
-    "morgan": "^1.6.1"
+    "morgan": "^1.6.1",
+    "mysql": "^2.10.2"
   },
   "devDependencies": {
     "connect-livereload": "^0.5.4",
