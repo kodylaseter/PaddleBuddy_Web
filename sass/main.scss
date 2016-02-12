@@ -73,6 +73,16 @@ div.row-center {
   border-color: $teal;
 }
 
+.btn-primary, .btn-primary:active, .btn-primary:focus {
+  background-color: $teal-light;
+  border-color: $teal-lightish;
+}
+
+.btn-primary:hover {
+  background-color: $teal-lightish;
+  border-color: $teal;
+}
+
 #toast {
   width:200px;
   height:20px;

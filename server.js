@@ -34,8 +34,9 @@ app.set('port', process.env.PORT || 8080);
 
 app.get('/api/rivers', function(req, res) {
     connection.query('SELECT * from river', function(error, rows, fields) {
-        if (error) console.log(error);
+        if (error) res.send(error);
         else {
+            console.log('Successfuly got rivers');
             res.send(JSON.stringify(rows));
         }
     });
@@ -43,11 +44,16 @@ app.get('/api/rivers', function(req, res) {
 
 app.post('/api/rivers', function(req, res) {
     var data = JSON.parse(JSON.stringify(req.body));
+    console.log('Adding river: ' + data.name);
     connection.query('INSERT INTO river SET ?', data, function(error) {
-        if (error) console.log('error');
+        if (error) res.send(error);
         else {
-            console.log('success');
-            res.send('success');
+            connection.query('SELECT * from river', function(error, rows, fields) {
+                if (error) res.send(error);
+                else {
+                    res.send(JSON.stringify(rows));
+                }
+            });
         }
     })
 });
@@ -62,11 +68,10 @@ app.post('/api/rivers', function(req, res) {
 //});
 
 app.get('/api/points/:river_id', function(req, res) {
-    console.log(req.params.river_id);
     connection.query('SELECT * FROM point where river_id = ?;', req.params.river_id, function(error, rows, fields) {
         if (error) console.log(error);
         else {
-            console.log(rows);
+            //console.log(rows);
             res.send(JSON.stringify(rows));
         }
     });
@@ -74,17 +79,18 @@ app.get('/api/points/:river_id', function(req, res) {
 
 app.post('/api/points', function(req, res) {
     var data = JSON.parse(JSON.stringify(req.body));
-    console.log(data);
-    for (var i = 0; i < data.length; i++) {
-        connection.query('INSERT INTO point SET ?', data[i], function(error) {
-            if (error) console.log('error');
-        });
-    }
+    connection.query('INSERT INTO point SET ?', data, function(error) {
+        if (error) res.send(error);
+        else {
+            res.send('Success');
+        }
+    });
 });
 
 app.delete('/api/points/:point_id', function(req, res) {
-    connection.query('DELETE FROM point where id = ?', req.params.point_id, function(error, rows) {
-        if (err) console.log(err);
+    connection.query('DELETE FROM point WHERE id = ?;', req.params.point_id, function(error) {
+        if (error) res.send(error);
+        else res.send('Success');
     })
 });
 

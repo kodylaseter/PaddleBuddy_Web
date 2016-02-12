@@ -28,6 +28,7 @@ pbWeb.controller('mapController', function($scope, $http) {
     var riverPath = new google.maps.Polyline();
     var lineCoords = [];
     var modifying = 0;
+    var mapCircle = null;
 
     //region Rivers
     $scope.rivers = [];
@@ -52,7 +53,7 @@ pbWeb.controller('mapController', function($scope, $http) {
             };
             $http.post('/api/rivers', river)
                 .success(function (data) {
-                    getRivers();
+                    $scope.rivers = data;
                     $scope.riverName = '';
                     modifying = 0;
                 })
@@ -103,26 +104,43 @@ pbWeb.controller('mapController', function($scope, $http) {
                     lng: lng,
                     river_id: id
                 };
+                console.log('submitting now');
                 $http.post('/api/points', data)
                     .success(function(data) {
-                        console.log("point success");
                         modifying = 0;
+                        console.log('successfully added');
                         refresh();
                     })
                     .error(function () {
-                        console.log('error submitting point')
+                        showToast('Error', 'Error submitting point');
                     });
             }
         }
+    }
+
+    $scope.deletePoint = function() {
+        $http.delete('/api/points/' + getNewestPoint().id)
+            .success(function(data) {
+                showToast('Warning', 'Deleted point');
+                refresh();
+            })
+            .error(function(data) {
+                console.log(data);
+            });
+    };
+
+    function getNewestPoint() {
+        return lineCoords[lineCoords.length - 1];
     }
     //endregion
 
     //region Line
 
     function refresh() {
+        var id = getSelectedRiverId();
         modifying = 1;
         console.log('refresh');
-        $http.get('/api/points/' + getSelectedRiverId())
+        $http.get('/api/points/' + id)
             .success( function(data) {
                 lineCoords = data;
                 riverPath.setMap(null);
@@ -132,6 +150,24 @@ pbWeb.controller('mapController', function($scope, $http) {
                     strokeColor: '#E57373',
                     strokeOpacity: 1.0,
                     strokeWeight: 2,
+                    map: $scope.map
+                });
+                var pos = {
+                    lat: getNewestPoint().lat,
+                    lng: getNewestPoint().lng
+                };
+                console.log(pos);
+                mapCircle = new google.maps.Marker({
+                    position: new google.maps.LatLng(pos),
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        fillOpacity: 0.8,
+                        fillColor: '#00ff00',
+                        strokeOpacity: 1.0,
+                        strokeColor: '#000000',
+                        strokeWeight: 2.0,
+                        scale: 4
+                    },
                     map: $scope.map
                 });
                 modifying = 0;
