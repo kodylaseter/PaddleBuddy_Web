@@ -28,7 +28,7 @@ pbWeb.controller('mapController', function($scope, $http) {
     var riverPath = new google.maps.Polyline();
     var lineCoords = [];
     var modifying = 0;
-    var mapCircle = null;
+    var mapCircle = new google.maps.Marker();
 
     //region Rivers
     $scope.rivers = [];
@@ -104,11 +104,9 @@ pbWeb.controller('mapController', function($scope, $http) {
                     lng: lng,
                     river_id: id
                 };
-                console.log('submitting now');
                 $http.post('/api/points', data)
                     .success(function(data) {
                         modifying = 0;
-                        console.log('successfully added');
                         refresh();
                     })
                     .error(function () {
@@ -121,7 +119,6 @@ pbWeb.controller('mapController', function($scope, $http) {
     $scope.deletePoint = function() {
         $http.delete('/api/points/' + getNewestPoint().id)
             .success(function(data) {
-                showToast('Warning', 'Deleted point');
                 refresh();
             })
             .error(function(data) {
@@ -139,37 +136,39 @@ pbWeb.controller('mapController', function($scope, $http) {
     function refresh() {
         var id = getSelectedRiverId();
         modifying = 1;
-        console.log('refresh');
         $http.get('/api/points/' + id)
             .success( function(data) {
                 lineCoords = data;
                 riverPath.setMap(null);
-                riverPath = new google.maps.Polyline({
-                    path: lineCoords,
-                    geodesic: true,
-                    strokeColor: '#E57373',
-                    strokeOpacity: 1.0,
-                    strokeWeight: 2,
-                    map: $scope.map
-                });
-                var pos = {
-                    lat: getNewestPoint().lat,
-                    lng: getNewestPoint().lng
-                };
-                console.log(pos);
-                mapCircle = new google.maps.Marker({
-                    position: new google.maps.LatLng(pos),
-                    icon: {
-                        path: google.maps.SymbolPath.CIRCLE,
-                        fillOpacity: 0.8,
-                        fillColor: '#00ff00',
+                mapCircle.setMap(null);
+                if (lineCoords.length > 0) {
+                    riverPath = new google.maps.Polyline({
+                        path: lineCoords,
+                        geodesic: true,
+                        strokeColor: '#E57373',
                         strokeOpacity: 1.0,
-                        strokeColor: '#000000',
-                        strokeWeight: 2.0,
-                        scale: 4
-                    },
-                    map: $scope.map
-                });
+                        strokeWeight: 2,
+                        map: $scope.map
+                    });
+                    var pos = {
+                        lat: getNewestPoint().lat,
+                        lng: getNewestPoint().lng
+                    };
+                    console.log('new river selected');
+                    mapCircle = new google.maps.Marker({
+                        position: new google.maps.LatLng(pos),
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            fillOpacity: 0.8,
+                            fillColor: '#00ff00',
+                            strokeOpacity: 1.0,
+                            strokeColor: '#000000',
+                            strokeWeight: 2.0,
+                            scale: 4
+                        },
+                        map: $scope.map
+                    });
+                }
                 modifying = 0;
             })
             .error( function() {
