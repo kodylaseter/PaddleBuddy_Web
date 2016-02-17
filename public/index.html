@@ -4,22 +4,29 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/map.css">
-    <title>PaddleBuddy Map Data</title>
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script><!-- load angular -->
+    <link rel="stylesheet" href="/css/main.css">
+    <!--<title>PaddleBuddy</title>-->
+    <script src="dist/angular.min.js"></script>
+    <script src="dist/angular-route.min.js"></script>
+    <script src="dist/jquery-1.12.0.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBIuCKiNReJwTU4frhP3ndPyvdrZt60pJU">
     </script>
-    <script src="core.js"></script>
+    <script src="js/main.js"></script>
 
 </head>
-<body ng-controller="MapController">
-    <nav class="navbar navbar-default">
+<body ng-controller="mainController">
+    <nav class="navbar navbar-inverse navbar-fixed-top navbar-custom">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">PaddleBuddy</a>
+            <!--<a class="navbar-brand" href="#/">PaddleBuddy</a>-->
         </div>
+        <ul class="nav navbar-nav navbar-right">
+            <li> <a href="#/"> <i class="glyphicon glyphicon-home white"></i> </a> </li>
+            <li> <a href="#map"> <i class="glyphicon glyphicon-globe white"></i> </a> </li>
+        </ul>
     </nav>
-    <div id="map" class="container"></div>
-    <button id="submitBtn" class="btn btn-default" ng-click="submitData()">Submit</button>
-
+    <div id="main" class="">
+        <div ng-view></div>
+    </div>
+    <div id="toast" style="display: none"></div>
 </body>
 </html>

@@ -1,17 +1,27 @@
 // set up ========================
 var express  = require('express');
 var app      = express();                               // create our app w/ express
-var mongoose = require('mongoose');                     // mongoose for mongodb
+//var mongoose = require('mongoose');                     // mongoose for mongodb
 var morgan = require('morgan');             // log requests to the console (express4)
 var bodyParser = require('body-parser');    // pull information from HTML POST (express4)
 var methodOverride = require('method-override'); // simulate DELETE and PUT (express4)
 var http = require('http');
-var Point = require('./public/models/point');
+var mysql = require('mysql');
+//var Point = require('./public/models/point');
+//var River = require('./public/models/river');
 
 // configuration =================
 
-mongoose.connect('mongodb://kodylaseter:manhunt1@ds047712.mongolab.com:47712/pbdb');     // connect to mongoDB database
+//mongoose.connect('mongodb://kodylaseter:manhunt1@ds047712.mongolab.com:47712/pbdb');     // connect to mongoDB database
 
+var connection = mysql.createConnection({
+    host: 'www.db4free.net',
+    user: 'kodylaseter',
+    password: 'password',
+    database: 'pb_test'
+});
+
+app.use(require('connect-livereload')({port: 35729}));
 app.use(express.static(__dirname + '/public'));                 // set the static files location /public/img will be /img for users
 app.use(morgan('dev'));                                         // log every request to the console
 app.use(bodyParser.urlencoded({'extended':'true'}));            // parse application/x-www-form-urlencoded
@@ -22,36 +32,68 @@ app.set('port', process.env.PORT || 8080);
 
 //ROUTES
 
-app.get('/api/points', function(req, res) {
+app.get('/api/rivers', function(req, res) {
+    connection.query('SELECT * from river', function(error, rows, fields) {
+        if (error) res.send(error);
+        else {
+            console.log('Successfuly got rivers');
+            res.send(JSON.stringify(rows));
+        }
+    });
+});
 
-    // use mongoose to get all todos in the database
-    Point.find(function(err, points) {
-        console.log('points get called');
+app.post('/api/rivers', function(req, res) {
+    var data = JSON.parse(JSON.stringify(req.body));
+    console.log('Adding river: ' + data.name);
+    connection.query('INSERT INTO river SET ?', data, function(error) {
+        if (error) res.send(error);
+        else {
+            connection.query('SELECT * from river', function(error, rows, fields) {
+                if (error) res.send(error);
+                else {
+                    res.send(JSON.stringify(rows));
+                }
+            });
+        }
+    })
+});
 
-        // if there is an error retrieving, send the error. nothing after res.send(err) will execute
-        if (err)
-            res.send(err)
+//app.get('/api/points', function(req, res) {
+//    connection.query('SELECT * from point', function(error, rows, fields) {
+//        if (error) console.log(error);
+//        else {
+//            res.send(JSON.stringify(rows));
+//        }
+//    });
+//});
 
-        res.json(points); // return all todos in JSON format
+app.get('/api/points/:river_id', function(req, res) {
+    connection.query('SELECT * FROM point where river_id = ?;', req.params.river_id, function(error, rows, fields) {
+        if (error) console.log(error);
+        else {
+            //console.log(rows);
+            res.send(JSON.stringify(rows));
+        }
     });
 });
 
 app.post('/api/points', function(req, res) {
-    //for (obj p : req)
-    //Point.create({
-    //    lat: req.body.lat,
-    //    lng: req.body.lng
-    //}, function(err, point) {
-    //    if (err) res.send(err);
-    //});
-    console.log(req);
+    var data = JSON.parse(JSON.stringify(req.body));
+    connection.query('INSERT INTO point SET ?', data, function(error) {
+        if (error) res.send(error);
+        else {
+            res.send('Success');
+        }
+    });
 });
 
-app.get('*', function(req, res) {
-    res.sendfile('./public/index.html');
+app.delete('/api/points/:point_id', function(req, res) {
+    connection.query('DELETE FROM point WHERE id = ?;', req.params.point_id, function(error) {
+        if (error) res.send(error);
+        else res.send('Success');
+    })
 });
-
 
 //launch server--------------------------------------------
-app.listen(8080);
-console.log("App listening on port 8080");
+app.listen(4000, '0.0.0.0');
+console.log("App listening on port 4000");

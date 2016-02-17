@@ -1,0 +1,109 @@
+$teal: #009688;
+$teal-dark: #00695C;
+$teal-light: #80CBC4;
+$teal-lightish: #4DB6AC;
+$light-grey: #FAFAFA;
+
+$mapHeight: 600px;
+
+#map {
+  height: $mapHeight;
+}
+
+#main {
+  margin: 70px 10px 0px 10px;
+}
+
+.navbar-custom {
+  background-color: $teal;
+  //#B2D0FE
+  border-color: $teal-dark;
+}
+
+.navbar-custom .navbar-brand {
+  color: $light-grey;
+
+}
+
+.list-group {
+  margin-bottom: 10px;
+}
+
+.list-group-item.active {
+   background-color: $teal-light;
+   border-color: $teal-lightish;
+ }
+
+.list-group-item.active:hover {
+  background-color: $teal-lightish;
+  border-color: $teal;
+}
+
+.river-item {
+  text-align: center;
+}
+
+#riverWell {
+  height: $mapHeight;
+  overflow: auto;
+  margin-bottom: 10px;
+}
+
+li.selected {
+  background-color: $teal-light;
+  border-color: $teal-lightish;
+  color: #fff;
+}
+
+div.btn-group {
+  display: inline-block;
+  margin-top: 10px;
+}
+
+div.row-center {
+  text-align: center;
+}
+
+.btn-primary, .btn-primary:active, .btn-primary:focus {
+  background-color: $teal-light;
+  border-color: $teal-lightish;
+}
+
+.btn-primary:hover {
+  background-color: $teal-lightish;
+  border-color: $teal;
+}
+
+.btn-primary, .btn-primary:active, .btn-primary:focus {
+  background-color: $teal-light;
+  border-color: $teal-lightish;
+}
+
+.btn-primary:hover {
+  background-color: $teal-lightish;
+  border-color: $teal;
+}
+
+#toast {
+  width:200px;
+  height:20px;
+  height:auto;
+  position:absolute;
+  left:50%;
+  margin-left:-100px;
+  bottom:10px;
+  background-color: green;
+  color: #F0F0F0;
+  font-family: Calibri;
+  font-size: 20px;
+  padding:10px;
+  text-align:center;
+  border-radius: 2px;
+  -webkit-box-shadow: 0px 0px 24px -1px rgba(16, 16, 16, 0.4);
+  -moz-box-shadow: 0px 0px 24px -1px rgba(16, 16, 16, 0.4);
+  box-shadow: 0px 0px 24px -1px rgba(16, 16, 16, 0.4);
+}
+
+.white {
+  color: $light-grey;
+}
