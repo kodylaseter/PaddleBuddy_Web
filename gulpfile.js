@@ -2,10 +2,6 @@
  * Created by klaseter3-gtri on 1/29/2016.
  */
 var gulp = require('gulp');
-var mongoose = require('mongoose');                     // mongoose for mongodb
-var morgan = require('morgan');             // log requests to the console (express4)
-var bodyParser = require('body-parser');    // pull information from HTML POST (express4)
-var methodOverride = require('method-override'); // simulate DELETE and PUT (express4)
 var sass = require('gulp-sass');
 var nodemon = require('gulp-nodemon');
 var tinylr;
