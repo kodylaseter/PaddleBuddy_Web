@@ -55,15 +55,6 @@ app.post('/api/rivers', function(req, res) {
     })
 });
 
-//app.get('/api/points', function(req, res) {
-//    connection.query('SELECT * from point', function(error, rows, fields) {
-//        if (error) console.log(error);
-//        else {
-//            res.send(JSON.stringify(rows));
-//        }
-//    });
-//});
-
 app.get('/api/points/:river_id', function(req, res) {
     connection.query('SELECT * FROM point where river_id = ?;', req.params.river_id, function(error, rows, fields) {
         if (error) res.send(error);
@@ -76,12 +67,12 @@ app.get('/api/points/:river_id', function(req, res) {
 
 app.post('/api/points', function(req, res) {
     var data = JSON.parse(JSON.stringify(req.body));
+    var riverID = data.river_id;
     var query = connection.query('INSERT INTO point SET ?', data, function(error) {
         if (error) res.send(error);
         else {
             var pointID = query._results[0].insertId;
-            console.log(pointID);
-            var check = connection.query('SELECT * FROM link WHERE begin = ? OR end = ?', [pointID, pointID], function(error, rows) {
+            var check = connection.query('SELECT * FROM link WHERE begin = ? OR end = ? OR river = ?', [pointID, pointID, riverID], function(error, rows) {
                 if (error) res.send(error);
                 else {
                     console.log(rows);
