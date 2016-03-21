@@ -33,7 +33,6 @@ app.get('/api/rivers', function(req, res) {
     connection.query('SELECT * from river', function(error, rows, fields) {
         if (error) res.send(error);
         else {
-            console.log('Successfuly got rivers');
             res.send(JSON.stringify(rows));
         }
     });
@@ -41,7 +40,6 @@ app.get('/api/rivers', function(req, res) {
 
 app.post('/api/rivers', function(req, res) {
     var data = JSON.parse(JSON.stringify(req.body));
-    console.log('Adding river: ' + data.name);
     connection.query('INSERT INTO river SET ?', data, function(error) {
         if (error) res.send(error);
         else {
@@ -67,18 +65,36 @@ app.get('/api/points/:river_id', function(req, res) {
 
 app.post('/api/points', function(req, res) {
     var data = JSON.parse(JSON.stringify(req.body));
-    var riverID = data.river_id;
-    var query = connection.query('INSERT INTO point SET ?', data, function(error) {
+    var prevPointID = data[0];
+    var point = data[1];
+    var riverID = point.river_id;
+    var query = connection.query('INSERT INTO point SET ?', point, function(error) {
         if (error) res.send(error);
         else {
             var pointID = query._results[0].insertId;
-            var check = connection.query('SELECT * FROM link WHERE begin = ? OR end = ? OR river = ?', [pointID, pointID, riverID], function(error, rows) {
+            //var check = connection.query('SELECT * FROM link WHERE river = ?', [riverID], function(error, rows) {
+            var check = connection.query('SELECT COUNT(*) as count FROM link WHERE river = ?', riverID, function(error, result) {
                 if (error) res.send(error);
                 else {
-                    console.log(rows);
+                    if (result.length < 1) {
+                        res.send('First point for this id, no link added');
+                    }
+                    else {
+                        var link = {
+                            begin: prevPointID,
+                            end: pointID,
+                            speed: 1,
+                            river: riverID
+                        };
+                        var test = connection.query('INSERT INTO link SET ?', link, function(error) {
+                            if (error) res.send(error);
+                            else {
+                                res.send('Success');
+                            }
+                        })
+                    }
                 }
             });
-            res.send('Success');
         }
     });
 });

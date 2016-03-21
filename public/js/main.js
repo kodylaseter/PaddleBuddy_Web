@@ -29,6 +29,7 @@ pbWeb.controller('mapController', function($scope, $http) {
     var lineCoords = [];
     var modifying = 0;
     var mapCircle = new google.maps.Marker();
+    var prevPointID = null;
 
     //region Rivers
     $scope.rivers = [];
@@ -104,7 +105,8 @@ pbWeb.controller('mapController', function($scope, $http) {
                     lng: lng,
                     river_id: id
                 };
-                $http.post('/api/points', data)
+                var totaldata = [prevPointID, data];
+                $http.post('/api/points', totaldata)
                     .success(function(data) {
                         modifying = 0;
                         refresh();
@@ -138,6 +140,8 @@ pbWeb.controller('mapController', function($scope, $http) {
         modifying = 1;
         $http.get('/api/points/' + id)
             .success( function(data) {
+                if (data[data.length -1] != null)
+                    prevPointID = data[data.length - 1].id;
                 lineCoords = data;
                 riverPath.setMap(null);
                 mapCircle.setMap(null);
@@ -154,7 +158,6 @@ pbWeb.controller('mapController', function($scope, $http) {
                         lat: getNewestPoint().lat,
                         lng: getNewestPoint().lng
                     };
-                    console.log('new river selected');
                     mapCircle = new google.maps.Marker({
                         position: new google.maps.LatLng(pos),
                         icon: {
