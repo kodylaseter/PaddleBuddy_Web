@@ -18,7 +18,7 @@ gulp.task('express', function() {
                 type: 'changed',
                 path: './public/index.html'
             });
-        })
+        });
 });
 
 gulp.task('livereload', function() {
