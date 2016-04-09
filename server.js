@@ -63,6 +63,15 @@ app.get('/api/points/:river_id', function(req, res) {
     });
 });
 
+app.get('/api/point/:id', function(req, res) {
+    connection.query('SELECT * FROM point where id = ? limit 1', req.params.id, function(error, rows, fields) {
+        if (error) res.send(error);
+        else {
+           res.send(JSON.stringify(rows[0]));
+        }
+    });
+});
+
 app.post('/api/points', function(req, res) {
     var data = JSON.parse(JSON.stringify(req.body));
     var prevPointID = data[0];
