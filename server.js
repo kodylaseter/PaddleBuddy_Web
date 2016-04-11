@@ -29,7 +29,7 @@ app.set('port', process.env.PORT || 8080);
 
 //ROUTES
 
-app.get('/api/rivers', function(req, res) {
+app.get('/api/web/rivers', function(req, res) {
     connection.query('SELECT * from river', function(error, rows, fields) {
         if (error) res.send(error);
         else {
@@ -38,7 +38,7 @@ app.get('/api/rivers', function(req, res) {
     });
 });
 
-app.post('/api/rivers', function(req, res) {
+app.post('/api/web/rivers', function(req, res) {
     var data = JSON.parse(JSON.stringify(req.body));
     connection.query('INSERT INTO river SET ?', data, function(error) {
         if (error) res.send(error);
@@ -53,17 +53,16 @@ app.post('/api/rivers', function(req, res) {
     })
 });
 
-app.get('/api/points/:river_id', function(req, res) {
+app.get('/api/web/points/:river_id', function(req, res) {
     connection.query('SELECT * FROM point where river_id = ?;', req.params.river_id, function(error, rows, fields) {
         if (error) res.send(error);
         else {
-            //console.log(rows);
             res.send(JSON.stringify(rows));
         }
     });
 });
 
-app.post('/api/points', function(req, res) {
+app.post('/api/web/points', function(req, res) {
     var data = JSON.parse(JSON.stringify(req.body));
     var prevPointID = data[0];
     var point = data[1];
@@ -99,12 +98,36 @@ app.post('/api/points', function(req, res) {
     });
 });
 
-app.delete('/api/points/:point_id', function(req, res) {
+app.delete('/api/web/points/:point_id', function(req, res) {
     connection.query('DELETE FROM point WHERE id = ?;', req.params.point_id, function(error) {
         if (error) res.send(error);
         else res.send('Success');
     })
 });
+
+app.get('/api/mobile/river/:id', function(req, res) {
+    connection.query('SELECT * FROM point WHERE river_id = ?', req.params.id, function(error, rows) {
+        var response = {};
+        if (error) {
+            response.success = false;
+            response.detail = error;
+        } else {
+            response.success = true;
+            var data = {};
+            data.id = req.params.id;
+            data.points = rows;
+            response.data = data;
+        }
+        res.send(response);
+    })
+});
+
+app.get('/api/mobile/*', function(req, res) {
+    res.send({
+        success: false,
+        detail: "Failed to hit any api endpoints!"
+    });
+})
 
 //launch server--------------------------------------------
 app.listen(4000, '0.0.0.0');

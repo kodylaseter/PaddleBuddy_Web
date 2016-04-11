@@ -35,7 +35,7 @@ pbWeb.controller('mapController', function($scope, $http) {
     $scope.rivers = [];
     function getRivers() {
         modifying = 1;
-        $http.get('/api/rivers')
+        $http.get('/api/web/rivers')
             .success(function(data) {
                 $scope.rivers = data;
                 modifying = 0;
@@ -52,7 +52,7 @@ pbWeb.controller('mapController', function($scope, $http) {
             var river = {
                 name: $scope.riverName
             };
-            $http.post('/api/rivers', river)
+            $http.post('/api/web/rivers', river)
                 .success(function (data) {
                     $scope.rivers = data;
                     $scope.riverName = '';
@@ -106,7 +106,7 @@ pbWeb.controller('mapController', function($scope, $http) {
                     river_id: id
                 };
                 var totaldata = [prevPointID, data];
-                $http.post('/api/points', totaldata)
+                $http.post('/api/web/points', totaldata)
                     .success(function(data) {
                         modifying = 0;
                         refresh();
@@ -119,7 +119,7 @@ pbWeb.controller('mapController', function($scope, $http) {
     }
 
     $scope.deletePoint = function() {
-        $http.delete('/api/points/' + getNewestPoint().id)
+        $http.delete('/api/web/points/' + getNewestPoint().id)
             .success(function(data) {
                 refresh();
             })
@@ -138,7 +138,7 @@ pbWeb.controller('mapController', function($scope, $http) {
     function refresh() {
         var id = getSelectedRiverId();
         modifying = 1;
-        $http.get('/api/points/' + id)
+        $http.get('/api/web/points/' + id)
             .success( function(data) {
                 if (data[data.length -1] != null)
                     prevPointID = data[data.length - 1].id;
