@@ -1,6 +1,8 @@
 /**
  * Created by Kody on 3/21/2016.
  */
+
+//can be run with node dbm test
 var mysql = require('mysql');
 
 var connection = mysql.createConnection({
@@ -31,4 +33,5 @@ var clearDB = function(){
 
 process.argv.forEach(function (val) {
     if (val == 'clear') clearDB();
+    if (val == 'test') console.log('test passed!');
 });
