@@ -9,3 +9,10 @@ CREATE TABLE `pb_test`.`river` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`));
+
+CREATE TABLE `pb_test`.`link` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `begin` INT NOT NULL,
+  `end` INT NOT NULL,
+  `speed` FLOAT NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`));
