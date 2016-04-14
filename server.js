@@ -119,7 +119,27 @@ app.get('/api/mobile/river/:id', function(req, res) {
             response.data = data;
         }
         res.send(response);
-    })
+    });
+});
+
+app.post('/api/mobile/closest_river', function(req, res) {
+    var point = JSON.parse(JSON.stringify(req.body));
+    console.log(point.lat);
+    //source http://stackoverflow.com/a/5933294
+    var query = 'SELECT river_id ,((ACOS(SIN(' + point.lat + ' * PI() / 180) * SIN(`lat` * PI() / 180) + COS(' + point.lat + ' * PI() / 180) * COS(`lat` * PI() / 180) * COS((' + point.lng + ' - `lng`) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) AS `distance` FROM `point` WHERE (`lat` BETWEEN (' + point.lat + ' - ' + 2 + ') AND (' + point.lat + ' + ' + 2 + ') AND `lng` BETWEEN (' + point.lng + ' - ' + 2 + ') AND (' + point.lng + ' + ' + 2 + ')) ORDER BY `distance` ASC limit 1;';
+    var response = {};
+    connection.query(query, function(error, rows) {
+        console.log(error);
+        if (error) {
+            res.send();
+        } else {
+            if (rows.length < 1) {
+                response.success = false;
+
+            }
+            connection.query()
+        }
+    });
 });
 
 app.get('/api/mobile/*', function(req, res) {
@@ -127,7 +147,16 @@ app.get('/api/mobile/*', function(req, res) {
         success: false,
         detail: "Failed to hit any api endpoints!"
     });
-})
+});
+
+
+/**
+ * Optional param shit
+ * @param success
+ * @param detail
+ * @param [data]
+ */
+
 
 //launch server--------------------------------------------
 app.listen(4000, '0.0.0.0');
