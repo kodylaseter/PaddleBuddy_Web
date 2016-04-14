@@ -124,20 +124,33 @@ app.get('/api/mobile/river/:id', function(req, res) {
 
 app.post('/api/mobile/closest_river', function(req, res) {
     var point = JSON.parse(JSON.stringify(req.body));
-    console.log(point.lat);
     //source http://stackoverflow.com/a/5933294
-    var query = 'SELECT river_id ,((ACOS(SIN(' + point.lat + ' * PI() / 180) * SIN(`lat` * PI() / 180) + COS(' + point.lat + ' * PI() / 180) * COS(`lat` * PI() / 180) * COS((' + point.lng + ' - `lng`) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) AS `distance` FROM `point` WHERE (`lat` BETWEEN (' + point.lat + ' - ' + 2 + ') AND (' + point.lat + ' + ' + 2 + ') AND `lng` BETWEEN (' + point.lng + ' - ' + 2 + ') AND (' + point.lng + ' + ' + 2 + ')) ORDER BY `distance` ASC limit 1;';
+    var query = 'SELECT river_id ,((ACOS(SIN(' + point.Lat + ' * PI() / 180) * SIN(`lat` * PI() / 180) + COS(' + point.Lat + ' * PI() / 180) * COS(`lat` * PI() / 180) * COS((' + point.Lng + ' - `lng`) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) AS `distance` FROM `point` WHERE (`lat` BETWEEN (' + point.Lat + ' - ' + 2 + ') AND (' + point.Lat + ' + ' + 2 + ') AND `lng` BETWEEN (' + point.Lng + ' - ' + 2 + ') AND (' + point.Lng + ' + ' + 2 + ')) ORDER BY `distance` ASC limit 1;';
     var response = {};
     connection.query(query, function(error, rows) {
-        console.log(error);
         if (error) {
-            res.send();
+            res.send(error);
         } else {
             if (rows.length < 1) {
                 response.success = false;
-
+                response.detail = 'No rows returned!';
+                res.send(response);
+            } else {
+                connection.query('SELECT * FROM point WHERE river_id = ?', rows[0].river_id, function(error, rows) {
+                    if (error) {
+                        response.success = false;
+                        response.detail = error;
+                    } else {
+                        response.success = true;
+                        var data = {};
+                        data.id = rows[0].river_id;
+                        data.points = rows;
+                        data.name = rows[0].name;
+                        response.data = data;
+                    }
+                    res.send(response);
+                });
             }
-            connection.query()
         }
     });
 });
@@ -148,15 +161,6 @@ app.get('/api/mobile/*', function(req, res) {
         detail: "Failed to hit any api endpoints!"
     });
 });
-
-
-/**
- * Optional param shit
- * @param success
- * @param detail
- * @param [data]
- */
-
 
 //launch server--------------------------------------------
 app.listen(4000, '0.0.0.0');
