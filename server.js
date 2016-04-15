@@ -155,6 +155,21 @@ app.post('/api/mobile/closest_river', function(req, res) {
     });
 });
 
+app.get('/api/mobile/rivers', function(req, res) {
+    connection.query('SELECT * from river', function(error, rows, fields) {
+        var response = {};
+        if (error) {
+            response.success = false;
+            response.detail = error;
+        }
+        else {
+            response.success = true;
+            response.data = rows;
+        }
+        res.send(response);
+    });
+});
+
 app.get('/api/mobile/*', function(req, res) {
     res.send({
         success: false,
