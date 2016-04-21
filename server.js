@@ -164,7 +164,7 @@ app.get('/api/mobile/rivers', function(req, res) {
         }
         else {
             response.success = true;
-            response.data = rows;
+            response.data = JSON.stringify(rows);
         }
         res.send(response);
     });
