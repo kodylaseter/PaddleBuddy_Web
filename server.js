@@ -6,6 +6,7 @@ var bodyParser = require('body-parser');    // pull information from HTML POST (
 var methodOverride = require('method-override'); // simulate DELETE and PUT (express4)
 var http = require('http');
 var mysql = require('mysql');
+var linq = require('linq');
 
 // configuration =================
 
@@ -174,34 +175,46 @@ app.get('/api/mobile/estimate_time', function(req, res) {
     var id1 = req.headers.p1;
     var id2 = req.headers.p2;
     var response = {};
-    connection.query('SELECT river_id FROM point WHERE id IN (?, ?)', [id1, id2], function(error, rows) {
-        console.log(rows);
+    //connection.query('SELECT river_id FROM point WHERE id IN (?, ?)', [id1, id2], function(error, rows) {
+    //    console.log(rows);
+    //    if (error) {
+    //        response.success = false;
+    //        response.detail = error;
+    //    } else if (!rows || rows.length < 2) {
+    //        response.success = false;
+    //        response.detail = "1 or fewer river ids returned";
+    //    } else if (rows[0].river_id != rows[1].river_id) {
+    //        response.success = false;
+    //        response.detail = "river ids don't match";
+    //    } else {
+    //        var river_id = rows[0].river_id;
+    //        connection.query('SELECT id, lat, lng FROM point WHERE river_id = ?', river_id, function(error, rows) {
+    //            if (error) {
+    //                response.success = false;
+    //                response.detail = error;
+    //            } else {
+    //                connection.query('SELECT * FROM link WHERE river_id = ?', river_id, function(error, rows) {
+    //                    if (error) {
+    //                        response.success = false;
+    //                        response.detail = error;
+    //                    } else {
+    //                        //http://stackoverflow.com/questions/13948407/mysql-replace-foreign-key-in-result-table-with-data-from-fk-table
+    //                    }
+    //                })
+    //            }
+    //        });
+    //    }
+    //    res.send(response);
+    //});
+    connection.query('select l.*, p1.*, p2.* from pb_test.link l inner join (select lat as begin_lat, lng as begin_lng, id as begin_id from pb_test.point) p1 on l.begin = p1.begin_id inner join (select lat as end_lat, lng as end_lng, id as end_id from pb_test.point) p2 on l.end = p2.end_id', function(error, rows) {
         if (error) {
             response.success = false;
             response.detail = error;
-        } else if (!rows || rows.length < 2) {
-            response.success = false;
-            response.detail = "1 or fewer river ids returned";
-        } else if (rows[0].river_id != rows[1].river_id) {
-            response.success = false;
-            response.detail = "river ids don't match";
         } else {
-            var river_id = rows[0].river_id;
-            connection.query('SELECT id, lat, lng FROM point WHERE river_id = ?', river_id, function(error, rows) {
-                if (error) {
-                    response.success = false;
-                    response.detail = error;
-                } else {
-                    connection.query('SELECT * FROM link WHERE river_id = ?', river_id, function(error, rows) {
-                        if (error) {
-                            response.success = false;
-                            response.detail = error;
-                        } else {
-                            //http://stackoverflow.com/questions/13948407/mysql-replace-foreign-key-in-result-table-with-data-from-fk-table
-                        }
-                    })
-                }
+            var b = rows.select(function(x) {
+                return x.id == 1;
             });
+            console.log(b);
         }
         res.send(response);
     });
