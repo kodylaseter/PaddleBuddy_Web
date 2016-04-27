@@ -211,10 +211,7 @@ app.get('/api/mobile/estimate_time', function(req, res) {
             response.success = false;
             response.detail = error;
         } else {
-            var b = rows.select(function(x) {
-                return x.id == 1;
-            });
-            console.log(b);
+            
         }
         res.send(response);
     });
