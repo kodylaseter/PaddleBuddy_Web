@@ -7,6 +7,7 @@ var methodOverride = require('method-override'); // simulate DELETE and PUT (exp
 var http = require('http');
 var mysql = require('mysql');
 var linq = require('linq');
+var geolib = require('geolib');
 
 // configuration =================
 
@@ -174,44 +175,51 @@ app.get('/api/mobile/rivers', function(req, res) {
 app.get('/api/mobile/estimate_time', function(req, res) {
     var id1 = req.headers.p1;
     var id2 = req.headers.p2;
+    var river_id = req.headers.river;
     var response = {};
-    //connection.query('SELECT river_id FROM point WHERE id IN (?, ?)', [id1, id2], function(error, rows) {
-    //    console.log(rows);
-    //    if (error) {
-    //        response.success = false;
-    //        response.detail = error;
-    //    } else if (!rows || rows.length < 2) {
-    //        response.success = false;
-    //        response.detail = "1 or fewer river ids returned";
-    //    } else if (rows[0].river_id != rows[1].river_id) {
-    //        response.success = false;
-    //        response.detail = "river ids don't match";
-    //    } else {
-    //        var river_id = rows[0].river_id;
-    //        connection.query('SELECT id, lat, lng FROM point WHERE river_id = ?', river_id, function(error, rows) {
-    //            if (error) {
-    //                response.success = false;
-    //                response.detail = error;
-    //            } else {
-    //                connection.query('SELECT * FROM link WHERE river_id = ?', river_id, function(error, rows) {
-    //                    if (error) {
-    //                        response.success = false;
-    //                        response.detail = error;
-    //                    } else {
-    //                        //http://stackoverflow.com/questions/13948407/mysql-replace-foreign-key-in-result-table-with-data-from-fk-table
-    //                    }
-    //                })
-    //            }
-    //        });
-    //    }
-    //    res.send(response);
-    //});
-    connection.query('select l.*, p1.*, p2.* from pb_test.link l inner join (select lat as begin_lat, lng as begin_lng, id as begin_id from pb_test.point) p1 on l.begin = p1.begin_id inner join (select lat as end_lat, lng as end_lng, id as end_id from pb_test.point) p2 on l.end = p2.end_id', function(error, rows) {
+    connection.query('select l.*, p1.*, p2.* from pb_test.link l inner join (select lat as begin_lat, lng as begin_lng, id as begin_id from pb_test.point) p1 on l.begin = p1.begin_id inner join (select lat as end_lat, lng as end_lng, id as end_id from pb_test.point) p2 on l.end = p2.end_id where river = ?', river_id, function(error, rows) {
         if (error) {
             response.success = false;
             response.detail = error;
         } else {
-            
+            var links = [];
+            var query = 'v => v.begin == ' + id1;
+            var temp = linq.from(rows).where(query).firstOrDefault();
+            var newId, index;
+            if (!temp) {
+                response.success = false;
+                response.detail = "unable to locate first point";
+            } else {
+                //TODO: NEED TO MAKE SURE THIS HANDLES ERRORS
+                while (temp && temp.end != id2) {
+                    if (!temp) {
+                        response.success = false;
+                        response.detail = "Did not reach end point";
+                        break;
+                    }
+                    links.push(temp);
+                    newId = temp.end;
+                    index = rows.indexOf(temp);
+                    rows.splice(index, 1);
+                    query = 'v => v.begin == ' + newId;
+                    temp = linq.from(rows).where(query).firstOrDefault();
+                }
+                if (temp.end == id2) {
+                    links.push(temp);
+                }
+                if (links[0].begin == id1 && links[links.length - 1].end == id2) {
+                    response.success = true;
+                    response.detail = "Full path";
+                    response.data = {
+                        distance: linksToDistance(links),
+                        unit: "meters"
+                    };
+                    //response.data = links;
+                } else {
+                    response.success = false;
+                    response.detail = "Did not retrieve proper path";
+                }
+            }
         }
         res.send(response);
     });
@@ -223,6 +231,25 @@ app.get('/api/mobile/*', function(req, res) {
         detail: "Failed to hit any api endpoints!"
     });
 });
+
+function linksToDistance(links) {
+    var points = [];
+    var link;
+    for (var i = 0; i < links.length; i++) {
+        link = links[i];
+        points.push({
+            latitude: link.begin_lat,
+            longitude: link.begin_lng
+        });
+        if (i == links.length - 1) {
+            points.push({
+                latitude: link.end_lat,
+                longitude: link.end_lng
+            });
+        }
+    }
+    return geolib.getPathLength(points);
+}
 
 //launch server--------------------------------------------
 app.listen(4000, '0.0.0.0');
