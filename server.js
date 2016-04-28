@@ -173,56 +173,76 @@ app.get('/api/mobile/rivers', function(req, res) {
 });
 
 app.get('/api/mobile/estimate_time', function(req, res) {
+    var response = {};
     var id1 = req.headers.p1;
     var id2 = req.headers.p2;
     var river_id = req.headers.river;
-    var response = {};
-    connection.query('select l.*, p1.*, p2.* from pb_test.link l inner join (select lat as begin_lat, lng as begin_lng, id as begin_id from pb_test.point) p1 on l.begin = p1.begin_id inner join (select lat as end_lat, lng as end_lng, id as end_id from pb_test.point) p2 on l.end = p2.end_id where river = ?', river_id, function(error, rows) {
-        if (error) {
-            response.success = false;
-            response.detail = error;
-        } else {
-            var links = [];
-            var query = 'v => v.begin == ' + id1;
-            var temp = linq.from(rows).where(query).firstOrDefault();
-            var newId, index;
-            if (!temp) {
+    //TODO: implement river_id getter; need to make it synchronous
+    //if (!river_id) {
+    //    var query = 'select river_id from pb_test.point where id in (' + id1 + ', ' + id2 + ')';
+    //    connection.query(query, function(error, rows) {
+    //        if (error) {
+    //            response.success = false;
+    //            response.detail = error;
+    //        } else if (rows.length < 2) {
+    //            response.success = false;
+    //            response.detail = "Less than 2 river ids returned";
+    //        } else if (rows[0].river_id != rows[1].river_id) {
+    //            response.success = false;
+    //            response.detail = "Points not on the same river";
+    //        } else {
+    //            river_id = rows[0].river_id;
+    //            console.log('inside first: ' + river_id);
+    //        }
+    //    })
+    //}
+    if (river_id) {
+        connection.query('select l.*, p1.*, p2.* from pb_test.link l inner join (select lat as begin_lat, lng as begin_lng, id as begin_id from pb_test.point) p1 on l.begin = p1.begin_id inner join (select lat as end_lat, lng as end_lng, id as end_id from pb_test.point) p2 on l.end = p2.end_id where river = ?', river_id, function(error, rows) {
+            if (error) {
                 response.success = false;
-                response.detail = "unable to locate first point";
+                response.detail = error;
             } else {
-                //TODO: NEED TO MAKE SURE THIS HANDLES ERRORS
-                while (temp && temp.end != id2) {
-                    if (!temp) {
-                        response.success = false;
-                        response.detail = "Did not reach end point";
-                        break;
-                    }
-                    links.push(temp);
-                    newId = temp.end;
-                    index = rows.indexOf(temp);
-                    rows.splice(index, 1);
-                    query = 'v => v.begin == ' + newId;
-                    temp = linq.from(rows).where(query).firstOrDefault();
-                }
-                if (temp.end == id2) {
-                    links.push(temp);
-                }
-                if (links[0].begin == id1 && links[links.length - 1].end == id2) {
-                    response.success = true;
-                    response.detail = "Full path";
-                    response.data = {
-                        distance: linksToDistance(links),
-                        unit: "meters"
-                    };
-                    //response.data = links;
-                } else {
+                var links = [];
+                var query = 'v => v.begin == ' + id1;
+                var temp = linq.from(rows).where(query).firstOrDefault();
+                var newId, index;
+                if (!temp) {
                     response.success = false;
-                    response.detail = "Did not retrieve proper path";
+                    response.detail = "unable to locate first point";
+                } else {
+                    //TODO: NEED TO MAKE SURE THIS HANDLES ERRORS
+                    while (temp && temp.end != id2) {
+                        if (!temp) {
+                            response.success = false;
+                            response.detail = "Did not reach end point";
+                            break;
+                        }
+                        links.push(temp);
+                        newId = temp.end;
+                        index = rows.indexOf(temp);
+                        rows.splice(index, 1);
+                        query = 'v => v.begin == ' + newId;
+                        temp = linq.from(rows).where(query).firstOrDefault();
+                    }
+                    if (temp.end == id2) {
+                        links.push(temp);
+                    }
+                    if (links[0].begin == id1 && links[links.length - 1].end == id2) {
+                        response.success = true;
+                        response.detail = "Full path";
+                        response.data = {
+                            time: linksToTime(links),
+                            unit: "minutes"
+                        }
+                    } else {
+                        response.success = false;
+                        response.detail = "Did not retrieve proper path";
+                    }
                 }
             }
-        }
-        res.send(response);
-    });
+            res.send(response);
+        });
+    }
 });
 
 app.get('/api/mobile/*', function(req, res) {
@@ -232,23 +252,24 @@ app.get('/api/mobile/*', function(req, res) {
     });
 });
 
-function linksToDistance(links) {
-    var points = [];
-    var link;
+function linksToTime(links) {
+    var time = 0;
+    var link, dist, start, end;
     for (var i = 0; i < links.length; i++) {
         link = links[i];
-        points.push({
+        start = {
             latitude: link.begin_lat,
             longitude: link.begin_lng
-        });
-        if (i == links.length - 1) {
-            points.push({
-                latitude: link.end_lat,
-                longitude: link.end_lng
-            });
-        }
+        };
+        end = {
+            latitude: link.end_lat,
+            longitude: link.end_lng
+        };
+        dist = geolib.getDistance(start, end);
+        dist = dist * 0.000621371;
+        time += dist / link.speed * 60;
     }
-    return geolib.getPathLength(points);
+    return time;
 }
 
 //launch server--------------------------------------------
