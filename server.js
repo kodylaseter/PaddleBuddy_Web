@@ -177,25 +177,6 @@ app.get('/api/mobile/estimate_time', function(req, res) {
     var id1 = req.headers.p1;
     var id2 = req.headers.p2;
     var river_id = req.headers.river;
-    //TODO: implement river_id getter; need to make it synchronous
-    //if (!river_id) {
-    //    var query = 'select river_id from pb_test.point where id in (' + id1 + ', ' + id2 + ')';
-    //    connection.query(query, function(error, rows) {
-    //        if (error) {
-    //            response.success = false;
-    //            response.detail = error;
-    //        } else if (rows.length < 2) {
-    //            response.success = false;
-    //            response.detail = "Less than 2 river ids returned";
-    //        } else if (rows[0].river_id != rows[1].river_id) {
-    //            response.success = false;
-    //            response.detail = "Points not on the same river";
-    //        } else {
-    //            river_id = rows[0].river_id;
-    //            console.log('inside first: ' + river_id);
-    //        }
-    //    })
-    //}
     if (river_id) {
         connection.query('select l.*, p1.*, p2.* from pb_test.link l inner join (select lat as begin_lat, lng as begin_lng, id as begin_id from pb_test.point) p1 on l.begin = p1.begin_id inner join (select lat as end_lat, lng as end_lng, id as end_id from pb_test.point) p2 on l.end = p2.end_id where river = ?', river_id, function(error, rows) {
             if (error) {
@@ -224,7 +205,7 @@ app.get('/api/mobile/estimate_time', function(req, res) {
                         query = 'v => v.begin == ' + newId;
                         temp = linq.from(rows).where(query).firstOrDefault();
                     }
-                    if (temp.end == id2) {
+                    if (temp != null && temp.end == id2) {
                         links.push(temp);
                     }
                     if (links[0].begin == id1 && links[links.length - 1].end == id2) {
@@ -252,6 +233,23 @@ app.get('/api/mobile/estimate_time', function(req, res) {
         });
     }
 });
+
+app.get('/api/mobile/point/:point_id', function(req, res) {
+    var response = {};
+    connection.query('SELECT * FROM point WHERE id = ?', req.params.point_id, function(error, rows) {
+        if (error) {
+            response.success = false;
+            response.detail = error;
+        } else if (rows.length != 1) {
+            response.success = false;
+            response.detail = "More or less than 1 point returned";
+        } else {
+            response.success = true;
+            response.data = rows;
+        }
+        res.send(response);
+    });
+})
 
 app.get('/api/mobile/*', function(req, res) {
     res.send({
