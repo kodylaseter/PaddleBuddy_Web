@@ -245,7 +245,7 @@ app.get('/api/mobile/point/:point_id', function(req, res) {
             response.detail = "More or less than 1 point returned";
         } else {
             response.success = true;
-            response.data = rows;
+            response.data = rows[0];
         }
         res.send(response);
     });
