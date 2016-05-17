@@ -230,9 +230,17 @@ app.get('/api/mobile/estimate_time', function(req, res) {
                     if (links[0].begin == id1 && links[links.length - 1].end == id2) {
                         response.success = true;
                         response.detail = "Full path";
+                        var values = linksToTime(links);
+                        var time = values[0];
+                        var dist = values[1];
                         response.data = {
-                            time: linksToTime(links),
-                            unit: "minutes"
+                            startid: id1,
+                            endid: id2,
+                            riverID: river_id,
+                            time: time,
+                            timeunit: "minutes",
+                            distance: dist,
+                            distanceunit: 'miles'
                         }
                     } else {
                         response.success = false;
@@ -254,6 +262,7 @@ app.get('/api/mobile/*', function(req, res) {
 
 function linksToTime(links) {
     var time = 0;
+    var totalDist = 0;
     var link, dist, start, end;
     for (var i = 0; i < links.length; i++) {
         link = links[i];
@@ -266,10 +275,12 @@ function linksToTime(links) {
             longitude: link.end_lng
         };
         dist = geolib.getDistance(start, end);
+        //meters to miles conversion
         dist = dist * 0.000621371;
+        totalDist += dist;
         time += dist / link.speed * 60;
     }
-    return time;
+    return [time, totalDist];
 }
 
 //launch server--------------------------------------------
