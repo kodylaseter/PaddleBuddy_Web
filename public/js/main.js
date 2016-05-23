@@ -28,7 +28,8 @@ pbWeb.controller('mapController', function($scope, $http) {
     var riverPath = new google.maps.Polyline();
     var lineCoords = [];
     var modifying = 0;
-    var mapCircle = new google.maps.Marker();
+    var markers = [];
+    //var mapCircle = new google.maps.Marker();
     var prevPointID = null;
 
     //region Rivers
@@ -56,11 +57,11 @@ pbWeb.controller('mapController', function($scope, $http) {
                 .success(function (data) {
                     $scope.rivers = data;
                     $scope.riverName = '';
-                    modifying = 0;
                 })
                 .error(function () {
                     console.log('error posting new river')
                 });
+            modifying = 0;
         }
     };
 
@@ -144,7 +145,9 @@ pbWeb.controller('mapController', function($scope, $http) {
                     prevPointID = data[data.length - 1].id;
                 lineCoords = data;
                 riverPath.setMap(null);
-                mapCircle.setMap(null);
+                for (i = 0; i < markers.length; i++) {
+                    markers[i].setMap(null);
+                }
                 if (lineCoords.length > 0) {
                     riverPath = new google.maps.Polyline({
                         path: lineCoords,
@@ -158,19 +161,31 @@ pbWeb.controller('mapController', function($scope, $http) {
                         lat: getNewestPoint().lat,
                         lng: getNewestPoint().lng
                     };
-                    mapCircle = new google.maps.Marker({
-                        position: new google.maps.LatLng(pos),
-                        icon: {
-                            path: google.maps.SymbolPath.CIRCLE,
-                            fillOpacity: 0.8,
-                            fillColor: '#00ff00',
-                            strokeOpacity: 1.0,
-                            strokeColor: '#000000',
-                            strokeWeight: 2.0,
-                            scale: 4
-                        },
-                        map: $scope.map
-                    });
+                    for (i = 0; i < lineCoords.length; i++) {
+                        var color = '#0000ff';
+                        var scale = 3;
+                        if (i == lineCoords.length - 1) {
+                            color = '#00ff00';
+                            scale = 4;
+                        }
+                        markers[i] = new google.maps.Marker({
+                            position: new google.maps.LatLng({
+                                lat: lineCoords[i].lat,
+                                lng: lineCoords[i].lng
+                            }),
+                            icon: {
+                                path: google.maps.SymbolPath.CIRCLE,
+                                fillOpacity: 0.8,
+                                fillColor: color,
+                                strokeOpacity: 1.0,
+                                strokeColor: '#000000',
+                                strokeWeight: 2.0,
+                                scale: scale
+                            },
+                            map: $scope.map
+                        });
+                        addMarkerListener(markers[i], i);
+                    }
                 }
                 modifying = 0;
             })
@@ -180,6 +195,31 @@ pbWeb.controller('mapController', function($scope, $http) {
 
     }
     //endregion
+
+    var contentHTML = "<div id='content'>" +
+        "<h4>Point Details</h4>" +
+        "<label> Launch site?</label>" +
+        "<input type='checkbox' checked='checked' style='margin-left: 10px'/>" +
+        "<br>" +
+        "<label> Label: </label>" +
+        "<input type='text' style='margin-left: 10px'/>" +
+        "<br>" +
+        "<button onclick='alert()'>Submit</button>" +
+        "</div>";
+
+    var infowindow = new google.maps.InfoWindow({
+        content: contentHTML
+    });
+
+    function saveData() {
+        alert();
+    }
+
+    function addMarkerListener(marker, id) {
+        marker.addListener('click', function() {
+            infowindow.open($scope.map, marker);
+        });
+    }
 
     //region Toast
     function showToast(type, text) {
