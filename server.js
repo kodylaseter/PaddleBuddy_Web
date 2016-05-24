@@ -107,6 +107,25 @@ app.delete('/api/web/points/:point_id', function(req, res) {
     })
 });
 
+app.post('/api/web/updatePoint', function(req, res) {
+    var data = JSON.parse(JSON.stringify(req.body));
+    var isLaunchSite = (data.isLaunchSite == true) ? 1 : 0;
+    console.log(data.id);
+    var query = 'UPDATE pb_test.point SET is_launch_site = ' + isLaunchSite.toString() + ', label = "' + data.label.toString() + '" WHERE id = ' + data.id;
+    console.log(query);
+    connection.query(query, function(error, rows) {
+        var response = {};
+        if (error) {
+            response.success = false;
+            response.detail = error;
+        } else {
+            response.success = true;
+            response.detail = "Successfully updated";
+        }
+        res.send(response);
+    });
+});
+
 app.get('/api/mobile/river/:id', function(req, res) {
     connection.query('SELECT * FROM point WHERE river_id = ?', req.params.id, function(error, rows) {
         var response = {};

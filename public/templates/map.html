@@ -1,12 +1,20 @@
 <div class="row">
     <div id="mapGroup" class="col-sm-9 col-xs-12" style="margin-bottom: 10px;">
          <div id="map"></div>
-        <div class="row-center">
-            <div class="btn-group" role="group">
-                <!--<button id="submitBtn" class="btn btn-primary" ng-click="addPoints()">Submit</button>-->
-                <!--<button id="undoBtn" class="btn btn-default" ng-click="removePoint()">Undo</button>-->
-                <!--<button id="clearBtn" class="btn btn-default" ng-click="clearPoints()">Clear</button>-->
-                <button id="deleteBtn" class="btn btn-default btn-danger" ng-click="deletePoint()">Delete Selected</button>
+        <div id="editPoint" class="row-center" style="margin-top: 10px; display: none;">
+            <button id="deleteBtn" class="btn btn-default btn-danger col-sm-3" ng-click="deletePoint()">Delete Selected</button>
+            <div class="col-sm-9">
+                <div class="col-sm-6">
+                    <label>Is Launch Site?</label>
+                    <input type="checkbox" text="Is launch site?" ng-model="isLaunchSite">
+                </div>
+                <div class="input-group col-sm-6">
+                    <input type="text" class="form-control" ng-model="pointLabel" style="text-align: center"
+                           placeholder="label">
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary" ng-click="submitPoint()">Submit</button>
+                    </span>
+                </div>
             </div>
         </div>
     </div>

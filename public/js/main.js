@@ -31,9 +31,11 @@ pbWeb.controller('mapController', function($scope, $http) {
     var markers = [];
     //var mapCircle = new google.maps.Marker();
     var prevPointID = null;
+    $scope.idSelectedPoint = null;
 
     //region Rivers
     $scope.rivers = [];
+    $scope.idSelectedRiver = null;
     function getRivers() {
         modifying = 1;
         $http.get('/api/web/rivers')
@@ -65,9 +67,9 @@ pbWeb.controller('mapController', function($scope, $http) {
         }
     };
 
-    $scope.idSelectedRiver = null;
     $scope.setSelected = function (riverIndex) {
         $scope.idSelectedRiver = riverIndex;
+        $scope.idSelectedPoint = null;
         refresh();
     };
 
@@ -122,6 +124,7 @@ pbWeb.controller('mapController', function($scope, $http) {
     $scope.deletePoint = function() {
         $http.delete('/api/web/points/' + getNewestPoint().id)
             .success(function(data) {
+                $scope.idSelectedPoint = null;
                 refresh();
             })
             .error(function(data) {
@@ -162,26 +165,12 @@ pbWeb.controller('mapController', function($scope, $http) {
                         lng: getNewestPoint().lng
                     };
                     for (i = 0; i < lineCoords.length; i++) {
-                        var color = '#0000ff';
-                        var scale = 3;
-                        if (i == lineCoords.length - 1) {
-                            color = '#00ff00';
-                            scale = 4;
-                        }
                         markers[i] = new google.maps.Marker({
                             position: new google.maps.LatLng({
                                 lat: lineCoords[i].lat,
                                 lng: lineCoords[i].lng
                             }),
-                            icon: {
-                                path: google.maps.SymbolPath.CIRCLE,
-                                fillOpacity: 0.8,
-                                fillColor: color,
-                                strokeOpacity: 1.0,
-                                strokeColor: '#000000',
-                                strokeWeight: 2.0,
-                                scale: scale
-                            },
+                            icon: createIcon(i),
                             map: $scope.map
                         });
                         addMarkerListener(markers[i], i);
@@ -194,30 +183,50 @@ pbWeb.controller('mapController', function($scope, $http) {
             });
 
     }
+
+    function createIcon(num) {
+        var color = (num == $scope.idSelectedPoint) ? '#ff0000' : '#0000ff';
+        var scale = (num == $scope.idSelectedPoint) ? 4 : 3;
+        return {
+                path: google.maps.SymbolPath.CIRCLE,
+                fillOpacity: 0.8,
+                fillColor: color,
+                strokeOpacity: 1.0,
+                strokeColor: '#000000',
+                strokeWeight: 2.0,
+                scale: scale
+        }
+    }
     //endregion
 
-    var contentHTML = "<div id='content'>" +
-        "<h4>Point Details</h4>" +
-        "<label> Launch site?</label>" +
-        "<input type='checkbox' checked='checked' style='margin-left: 10px'/>" +
-        "<br>" +
-        "<label> Label: </label>" +
-        "<input type='text' style='margin-left: 10px'/>" +
-        "<br>" +
-        "<button onclick='alert()'>Submit</button>" +
-        "</div>";
+    $scope.submitPoint = function() {
+        var data = {
+            isLaunchSite: $scope.isLaunchSite,
+            label: $scope.pointLabel,
+            id: $scope.idSelectedPoint
+        };
+        $http.post('/api/web/updatePoint', data)
+            .success(function (data) {
+                console.log(data);
+            })
+            .error(function () {
+                showToast('error updating points');
+            });
 
-    var infowindow = new google.maps.InfoWindow({
-        content: contentHTML
-    });
-
-    function saveData() {
-        alert();
-    }
+    };
 
     function addMarkerListener(marker, id) {
         marker.addListener('click', function() {
-            infowindow.open($scope.map, marker);
+            var prev = markers[$scope.idSelectedPoint];
+            if (prev != null) prev.setIcon(createIcon(9999999));
+            if (id != $scope.idSelectedPoint) {
+                $scope.idSelectedPoint = id;
+                marker.setIcon(createIcon(id));
+                showEdit();
+            } else {
+                $scope.idSelectedPoint = null;
+                hideEdit();
+            }
         });
     }
 
@@ -234,4 +243,13 @@ pbWeb.controller('mapController', function($scope, $http) {
         $('#toast').fadeIn(400).delay(2000).fadeOut(400);
     }
     //endregion
+
+    //region Edit
+    function hideEdit() {
+        $("#editPoint").css("display", "none");
+    }
+
+    function showEdit() {
+        $("#editPoint").css("display", "block");
+    }
 });
