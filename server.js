@@ -9,33 +9,25 @@ var mysql = require('mysql');
 var linq = require('linq');
 var geolib = require('geolib');
 
-// configuration =================
-
-//mongoose.connect('mongodb://kodylaseter:manhunt1@ds047712.mongolab.com:47712/pbdb');     // connect to mongoDB database
-
-// var connection = mysql.createConnection({
-//     host: 'www.db4free.net',
-//     user: 'kodylaseter',
-//     password: 'password',
-//     database: 'pb_test'
-// });
-
-//for openshift connection
-// var connection = mysql.createConnection({
-//     host     : process.env.OPENSHIFT_MYSQL_DB_HOST,
-//     user     : process.env.OPENSHIFT_MYSQL_DB_USERNAME,
-//     password : process.env.OPENSHIFT_MYSQL_DB_PASSWORD,
-//     port     : process.env.OPENSHIFT_MYSQL_DB_PORT,
-//     database : process.env.OPENSHIFT_APP_NAME
-//  });
-
-var connection = mysql.createConnection({
-    host: '127.0.0.1',
-    port: '3307',
-    user: 'adminkUDs7B1',
-    password: '6iA5h6FM9QCb',
-    database: 'paddlebuddy'
-});
+if (process.env.OPENSHIFT_MYSQL_DB_PASSWORD) {
+    console.log('Openshift');
+    var connection = mysql.createConnection({
+        host     : process.env.OPENSHIFT_MYSQL_DB_HOST,
+        user     : process.env.OPENSHIFT_MYSQL_DB_USERNAME,
+        password : process.env.OPENSHIFT_MYSQL_DB_PASSWORD,
+        port     : process.env.OPENSHIFT_MYSQL_DB_PORT,
+        database : process.env.OPENSHIFT_APP_NAME
+    });
+} else {
+    console.log('Local');
+    var connection = mysql.createConnection({
+        host: '127.0.0.1',
+        port: '3307',
+        user: 'adminkUDs7B1',
+        password: '6iA5h6FM9QCb',
+        database: 'paddlebuddy'
+    });
+}
 
 app.use(require('connect-livereload')({port: 35729}));
 app.use(express.static(__dirname + '/public'));                 // set the static files location /public/img will be /img for users
@@ -52,6 +44,7 @@ app.get('/api/web/rivers', function(req, res) {
     connection.query('SELECT * from river', function(error, rows, fields) {
         if (error) res.send(error);
         else {
+            console.log(rows);
             res.send(JSON.stringify(rows));
         }
     });
@@ -318,5 +311,8 @@ function linksToTime(links) {
 }
 
 //launch server--------------------------------------------
-app.listen(4000, '0.0.0.0');
-console.log("App listening on port 4000");
+var port = process.env.OPENSHIFT_NODEJS_PORT || 4000;
+var ip = process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0';
+
+app.listen(4000, ip);
+console.log("App listening on port " + port);
