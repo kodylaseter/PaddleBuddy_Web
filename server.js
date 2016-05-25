@@ -13,11 +13,28 @@ var geolib = require('geolib');
 
 //mongoose.connect('mongodb://kodylaseter:manhunt1@ds047712.mongolab.com:47712/pbdb');     // connect to mongoDB database
 
+// var connection = mysql.createConnection({
+//     host: 'www.db4free.net',
+//     user: 'kodylaseter',
+//     password: 'password',
+//     database: 'pb_test'
+// });
+
+//for openshift connection
+// var connection = mysql.createConnection({
+//     host     : process.env.OPENSHIFT_MYSQL_DB_HOST,
+//     user     : process.env.OPENSHIFT_MYSQL_DB_USERNAME,
+//     password : process.env.OPENSHIFT_MYSQL_DB_PASSWORD,
+//     port     : process.env.OPENSHIFT_MYSQL_DB_PORT,
+//     database : process.env.OPENSHIFT_APP_NAME
+//  });
+
 var connection = mysql.createConnection({
-    host: 'www.db4free.net',
-    user: 'kodylaseter',
-    password: 'password',
-    database: 'pb_test'
+    host: '127.0.0.1',
+    port: '3307',
+    user: 'adminkUDs7B1',
+    password: '6iA5h6FM9QCb',
+    database: 'paddlebuddy'
 });
 
 app.use(require('connect-livereload')({port: 35729}));
