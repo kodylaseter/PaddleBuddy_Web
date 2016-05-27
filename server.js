@@ -1,6 +1,9 @@
 // set up ========================
 var express  = require('express');
 var app      = express();                               // create our app w/ express
+var port = process.env.OPENSHIFT_NODEJS_PORT || 4000;
+var ip = process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0';
+
 var morgan = require('morgan');             // log requests to the console (express4)
 var bodyParser = require('body-parser');    // pull information from HTML POST (express4)
 var methodOverride = require('method-override'); // simulate DELETE and PUT (express4)
@@ -10,7 +13,7 @@ var linq = require('linq');
 var geolib = require('geolib');
 
 if (process.env.OPENSHIFT_MYSQL_DB_PASSWORD) {
-    console.log('Openshift');
+    console.log('Openshift DB access');
     var connection = mysql.createConnection({
         host     : process.env.OPENSHIFT_MYSQL_DB_HOST,
         user     : process.env.OPENSHIFT_MYSQL_DB_USERNAME,
@@ -19,7 +22,7 @@ if (process.env.OPENSHIFT_MYSQL_DB_PASSWORD) {
         database : process.env.OPENSHIFT_APP_NAME
     });
 } else {
-    console.log('Local');
+    console.log('Local DB access');
     var connection = mysql.createConnection({
         host: '127.0.0.1',
         port: '3307',
@@ -34,8 +37,7 @@ app.use(express.static(__dirname + '/public'));                 // set the stati
 app.use(morgan('dev'));                                         // log every request to the console
 app.use(bodyParser.urlencoded({'extended':'true'}));            // parse application/x-www-form-urlencoded
 app.use(bodyParser.json());                                     // parse application/json
-app.use(bodyParser.json({ type: 'application/vnd.api+json' })); // parse application/vnd.api+json as json
-app.use(methodOverride());
+//app.use(bodyParser.json({ type: 'application/vnd.api+json' })); // parse application/vnd.api+json as json
 app.set('port', process.env.PORT || 8080);
 
 //ROUTES
@@ -44,7 +46,6 @@ app.get('/api/web/rivers', function(req, res) {
     connection.query('SELECT * from river', function(error, rows, fields) {
         if (error) res.send(error);
         else {
-            console.log(rows);
             res.send(JSON.stringify(rows));
         }
     });
@@ -121,7 +122,7 @@ app.post('/api/web/updatePoint', function(req, res) {
     var data = JSON.parse(JSON.stringify(req.body));
     var isLaunchSite = (data.isLaunchSite == true) ? 1 : 0;
     console.log(data.id);
-    var query = 'UPDATE pb_test.point SET is_launch_site = ' + isLaunchSite.toString() + ', label = "' + data.label.toString() + '" WHERE id = ' + data.id;
+    var query = 'UPDATE point SET is_launch_site = ' + isLaunchSite.toString() + ', label = "' + data.label.toString() + '" WHERE id = ' + data.id;
     console.log(query);
     connection.query(query, function(error, rows) {
         var response = {};
@@ -206,8 +207,8 @@ app.get('/api/mobile/estimate_time', function(req, res) {
     var id1 = req.headers.p1;
     var id2 = req.headers.p2;
     var river_id = req.headers.river;
-    if (river_id) {
-        connection.query('select l.*, p1.*, p2.* from pb_test.link l inner join (select lat as begin_lat, lng as begin_lng, id as begin_id from pb_test.point) p1 on l.begin = p1.begin_id inner join (select lat as end_lat, lng as end_lng, id as end_id from pb_test.point) p2 on l.end = p2.end_id where river = ?', river_id, function(error, rows) {
+    if (id1 && id2 && river_id) {
+        connection.query('select l.*, p1.*, p2.* from link l inner join (select lat as begin_lat, lng as begin_lng, id as begin_id from point) p1 on l.begin = p1.begin_id inner join (select lat as end_lat, lng as end_lng, id as end_id from point) p2 on l.end = p2.end_id where river = ?', river_id, function(error, rows) {
             if (error) {
                 response.success = false;
                 response.detail = error;
@@ -258,9 +259,13 @@ app.get('/api/mobile/estimate_time', function(req, res) {
                     }
                 }
             }
-            res.send(response);
         });
+    } else {
+        response.success = false;
+        response.detail = "Start, end, or river is null";
+
     }
+	res.send(response);
 });
 
 app.get('/api/mobile/point/:point_id', function(req, res) {
@@ -287,6 +292,10 @@ app.get('/api/mobile/*', function(req, res) {
     });
 });
 
+app.get('/', function(req, res) {
+    res.send("<html><body><h1>DBHottest</h1></body></html>");
+});
+
 function linksToTime(links) {
     var time = 0;
     var totalDist = 0;
@@ -311,8 +320,6 @@ function linksToTime(links) {
 }
 
 //launch server--------------------------------------------
-var port = process.env.OPENSHIFT_NODEJS_PORT || 4000;
-var ip = process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0';
 
-app.listen(4000, ip);
-console.log("App listening on port " + port);
+app.listen(port, ip);
+console.log("App listening on " + ip + ":" + port);
