@@ -184,7 +184,7 @@ angular.module('pbWeb').controller('mapController', function($scope, $http) {
             label: $scope.pointLabel,
             id: $scope.idSelectedPoint
         };
-        $http.post('/api/web/updatePoint', data)
+        $http.post('/api/web/update_point', data)
             .success(function (data) {
                 console.log(data);
             })

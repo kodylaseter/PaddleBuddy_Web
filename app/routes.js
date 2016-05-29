@@ -83,7 +83,7 @@ module.exports = function(app, passport, connection) {
         })
     });
 
-    app.post('/api/web/updatePoint', function(req, res) {
+    app.post('/api/web/update_point', function(req, res) {
         var data = JSON.parse(JSON.stringify(req.body));
         var isLaunchSite = (data.isLaunchSite == true) ? 1 : 0;
         console.log(data.id);
@@ -152,8 +152,38 @@ module.exports = function(app, passport, connection) {
         });
     });
 
-    app.get('/api/mobile/rivers', function(req, res) {
+    app.get('/api/mobile/all_rivers', function(req, res) {
         connection.query('SELECT * from river', function(error, rows, fields) {
+            var response = {};
+            if (error) {
+                response.success = false;
+                response.detail = error;
+            }
+            else {
+                response.success = true;
+                response.data = rows;
+            }
+            res.send(response);
+        });
+    });
+
+    app.get('/api/mobile/all_points', function(req, res) {
+        connection.query('SELECT * from point', function(error, rows, fields) {
+            var response = {};
+            if (error) {
+                response.success = false;
+                response.detail = error;
+            }
+            else {
+                response.success = true;
+                response.data = rows;
+            }
+            res.send(response);
+        });
+    });
+
+    app.get('/api/mobile/all_links', function(req, res) {
+        connection.query('SELECT * from link', function(error, rows, fields) {
             var response = {};
             if (error) {
                 response.success = false;
