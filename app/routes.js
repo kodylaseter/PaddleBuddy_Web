@@ -31,8 +31,8 @@ module.exports = function(app, passport, connection) {
         })
     });
 
-    app.get('/api/web/points/:river_id', function(req, res) {
-        connection.query('SELECT * FROM point where river_id = ?;', req.params.river_id, function(error, rows, fields) {
+    app.get('/api/web/points/:riverId', function(req, res) {
+        connection.query('SELECT * FROM point where riverId = ?;', req.params.riverId, function(error, rows, fields) {
             if (error) res.send(error);
             else {
                 res.send(JSON.stringify(rows));
@@ -44,29 +44,31 @@ module.exports = function(app, passport, connection) {
         var data = JSON.parse(JSON.stringify(req.body));
         var prevPointID = data[0];
         var point = data[1];
-        var riverID = point.river_id;
-        var query = connection.query('INSERT INTO point SET ?', point, function(error) {
+        var riverID = point.riverId;
+        var query = connection.query('INSERT INTO point SET ?', point, function(error, rows) {
             if (error) res.send(error);
             else {
-                var pointID = query._results[0].insertId;
+                var point = {
+                    id: rows.insertId
+                };
                 //var check = connection.query('SELECT * FROM link WHERE river = ?', [riverID], function(error, rows) {
                 var check = connection.query('SELECT COUNT(*) as count FROM link WHERE river = ?', riverID, function(error, result) {
                     if (error) res.send(error);
                     else {
                         if (result.length < 1) {
-                            res.send('First point for this id, no link added');
+                            res.send(point);
                         }
                         else {
                             var link = {
                                 begin: prevPointID,
-                                end: pointID,
+                                end: point.id,
                                 speed: 1,
                                 river: riverID
                             };
                             var test = connection.query('INSERT INTO link SET ?', link, function(error) {
                                 if (error) res.send(error);
                                 else {
-                                    res.send('Success');
+                                    res.send(point);
                                 }
                             })
                         }
@@ -87,10 +89,11 @@ module.exports = function(app, passport, connection) {
         var data = JSON.parse(JSON.stringify(req.body));
         var isLaunchSite = (data.isLaunchSite == true) ? 1 : 0;
         console.log(data.id);
-        var query = 'UPDATE point SET is_launch_site = ' + isLaunchSite.toString() + ', label = "' + data.label.toString() + '" WHERE id = ' + data.id;
-        console.log(query);
+        var query = 'UPDATE point SET isLaunchSite = ' + isLaunchSite.toString() + ', label = "' + data.label.toString() + '" WHERE id = ' + data.id;
         connection.query(query, function(error, rows) {
             var response = {};
+            console.log(rows);
+            console.log(query);
             if (error) {
                 response.success = false;
                 response.detail = error;
@@ -103,7 +106,7 @@ module.exports = function(app, passport, connection) {
     });
 
     app.get('/api/mobile/river/:id', function(req, res) {
-        connection.query('SELECT * FROM point WHERE river_id = ?', req.params.id, function(error, rows) {
+        connection.query('SELECT * FROM point WHERE riverId = ?', req.params.id, function(error, rows) {
             var response = {};
             if (error) {
                 response.success = false;
@@ -133,7 +136,7 @@ module.exports = function(app, passport, connection) {
                     response.detail = 'No rows returned!';
                     res.send(response);
                 } else {
-                    connection.query('SELECT * FROM point WHERE river_id = ?', rows[0].river_id, function(error, rows) {
+                    connection.query('SELECT * FROM point WHERE riverId = ?', rows[0].riverId, function(error, rows) {
                         if (error) {
                             response.success = false;
                             response.detail = error;
@@ -177,8 +180,7 @@ module.exports = function(app, passport, connection) {
             else {
                 //todo: this is not right
                 for (var i = 0; i < rows.length; i++) {
-                    if (rows[i].is_launch_site == 0) rows[i].islaunchsite = true;
-                    else rows[i].islaunchsite = false;
+                    rows[i].isLaunchSite = (rows[i].isLaunchSite == 0) ? false : true;
                 }
                 response.success = true;
                 response.data = rows;
@@ -207,7 +209,7 @@ module.exports = function(app, passport, connection) {
         var id1 = req.headers.p1;
         var id2 = req.headers.p2;
         var river_id = req.headers.river;
-        if (id1 && id2 && river_id) {
+        if (id1 && id2 && riverId) {
             connection.query('select l.*, p1.*, p2.* from link l inner join (select lat as begin_lat, lng as begin_lng, id as begin_id from point) p1 on l.begin = p1.begin_id inner join (select lat as end_lat, lng as end_lng, id as end_id from point) p2 on l.end = p2.end_id where river = ?', river_id, function(error, rows) {
                 if (error) {
                     response.success = false;
@@ -247,7 +249,7 @@ module.exports = function(app, passport, connection) {
                             response.data = {
                                 startid: id1,
                                 endid: id2,
-                                riverID: river_id,
+                                riverID: riverId,
                                 time: time,
                                 timeunit: "minutes",
                                 distance: dist,
@@ -267,9 +269,9 @@ module.exports = function(app, passport, connection) {
         }
     });
 
-    app.get('/api/mobile/point/:point_id', function(req, res) {
+    app.get('/api/mobile/point/:pointId', function(req, res) {
         var response = {};
-        connection.query('SELECT * FROM point WHERE id = ?', req.params.point_id, function(error, rows) {
+        connection.query('SELECT * FROM point WHERE id = ?', req.params.pointId, function(error, rows) {
             if (error) {
                 response.success = false;
                 response.detail = error;

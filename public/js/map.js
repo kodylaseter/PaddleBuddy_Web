@@ -8,9 +8,8 @@ angular.module('pbWeb').controller('mapController', function($scope, $http) {
     var lineCoords = [];
     var modifying = 0;
     var markers = [];
-    //var mapCircle = new google.maps.Marker();
     var prevPointID = null;
-    $scope.idSelectedPoint = null;
+    var idSelectedPoint = null;
 
     //region Rivers
     $scope.rivers = [];
@@ -46,14 +45,22 @@ angular.module('pbWeb').controller('mapController', function($scope, $http) {
         }
     };
 
-    $scope.setSelected = function (riverIndex) {
+    $scope.setSelectedRiverId = function (riverIndex) {
         $scope.idSelectedRiver = riverIndex;
-        $scope.idSelectedPoint = null;
+        setSelectedPointId(null);
         refresh();
     };
 
     function getSelectedRiverId() {
         return $scope.rivers[$scope.idSelectedRiver].id;
+    }
+    
+    function setSelectedPointId(id) {
+        idSelectedPoint = id;
+    }
+    
+    function getSelectedPointId() {
+        return idSelectedPoint;
     }
 
     //endregion
@@ -85,11 +92,11 @@ angular.module('pbWeb').controller('mapController', function($scope, $http) {
                 var data = {
                     lat: lat,
                     lng: lng,
-                    river_id: id
+                    riverId: id
                 };
                 var totaldata = [prevPointID, data];
                 $http.post('/api/web/points', totaldata)
-                    .success(function(data) {
+                    .success(function(response) {
                         modifying = 0;
                         refresh();
                     })
@@ -103,7 +110,7 @@ angular.module('pbWeb').controller('mapController', function($scope, $http) {
     $scope.deletePoint = function() {
         $http.delete('/api/web/points/' + getNewestPoint().id)
             .success(function(data) {
-                $scope.idSelectedPoint = null;
+                setSelectedPointId(null);
                 refresh();
             })
             .error(function(data) {
@@ -149,10 +156,11 @@ angular.module('pbWeb').controller('mapController', function($scope, $http) {
                                 lat: lineCoords[i].lat,
                                 lng: lineCoords[i].lng
                             }),
-                            icon: createIcon(i),
+                            icon: createIcon(lineCoords[i].id),
                             map: $scope.map
                         });
-                        addMarkerListener(markers[i], i);
+                        markers[i].realId = lineCoords[i].id;
+                        addMarkerListener(markers[i]);
                     }
                 }
                 modifying = 0;
@@ -164,8 +172,8 @@ angular.module('pbWeb').controller('mapController', function($scope, $http) {
     }
 
     function createIcon(num) {
-        var color = (num == $scope.idSelectedPoint) ? '#ff0000' : '#0000ff';
-        var scale = (num == $scope.idSelectedPoint) ? 4 : 3;
+        var color = (num == getSelectedPointId()) ? '#ff0000' : '#0000ff';
+        var scale = (num == getSelectedPointId()) ? 4 : 3;
         return {
                 path: google.maps.SymbolPath.CIRCLE,
                 fillOpacity: 0.8,
@@ -182,11 +190,13 @@ angular.module('pbWeb').controller('mapController', function($scope, $http) {
         var data = {
             isLaunchSite: $scope.isLaunchSite,
             label: $scope.pointLabel,
-            id: $scope.idSelectedPoint
+            id: getSelectedPointId()
         };
+        console.log(data);
         $http.post('/api/web/update_point', data)
             .success(function (data) {
-                console.log(data);
+                setSelectedPointId(null);
+                clearCurrentMarker();
             })
             .error(function () {
                 showToast('error updating points');
@@ -194,19 +204,29 @@ angular.module('pbWeb').controller('mapController', function($scope, $http) {
 
     };
 
-    function addMarkerListener(marker, id) {
+    function addMarkerListener(marker) {
         marker.addListener('click', function() {
-            var prev = markers[$scope.idSelectedPoint];
-            if (prev != null) prev.setIcon(createIcon(9999999));
-            if (id != $scope.idSelectedPoint) {
-                $scope.idSelectedPoint = id;
-                marker.setIcon(createIcon(id));
+            clearCurrentMarker();
+            if (marker.realId != getSelectedPointId()) {
+                setSelectedPointId(marker.realId);
+                marker.setIcon(createIcon(marker.realId));
                 showEdit();
             } else {
-                $scope.idSelectedPoint = null;
+                setSelectedPointId(null);
                 hideEdit();
             }
         });
+    }
+    
+    function clearCurrentMarker() {
+        var res = markers.filter(function(x) {return x.realId == getSelectedPointId()});
+        if (res != null && res.length > 0) {
+            if (res.length > 1) {
+                showToast('More than one marker returned for this id. badd');
+            } else {
+                res[0].setIcon(createIcon(9999999));
+            }
+        }
     }
 
     //region Toast

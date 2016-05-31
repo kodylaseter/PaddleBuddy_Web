@@ -22,7 +22,7 @@
         <div id="riverWell" class="well">
             <ul id="riverList" class="list-group">
                 <li class="list-group-item river-item" ng-repeat="river in rivers"
-                    ng-click="setSelected($index)" ng-class="{selected: $index == idSelectedRiver}">{{ river.name }}</li>
+                    ng-click="setSelectedRiverId($index)" ng-class="{selected: $index == idSelectedRiver}">{{ river.name }}</li>
             </ul>
         </div>
         <div id="riverForm" class="input-group">
