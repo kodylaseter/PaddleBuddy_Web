@@ -175,6 +175,11 @@ module.exports = function(app, passport, connection) {
                 response.detail = error;
             }
             else {
+                //todo: this is not right
+                for (var i = 0; i < rows.length; i++) {
+                    if (rows[i].is_launch_site == 0) rows[i].islaunchsite = true;
+                    else rows[i].islaunchsite = false;
+                }
                 response.success = true;
                 response.data = rows;
             }
