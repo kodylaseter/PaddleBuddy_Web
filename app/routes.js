@@ -209,7 +209,7 @@ module.exports = function(app, passport, connection) {
         var id1 = req.headers.p1;
         var id2 = req.headers.p2;
         var river_id = req.headers.river;
-        if (id1 && id2 && riverId) {
+        if (id1 && id2 && river_id) {
             connection.query('select l.*, p1.*, p2.* from link l inner join (select lat as begin_lat, lng as begin_lng, id as begin_id from point) p1 on l.begin = p1.begin_id inner join (select lat as end_lat, lng as end_lng, id as end_id from point) p2 on l.end = p2.end_id where river = ?', river_id, function(error, rows) {
                 if (error) {
                     response.success = false;
@@ -249,7 +249,7 @@ module.exports = function(app, passport, connection) {
                             response.data = {
                                 startid: id1,
                                 endid: id2,
-                                riverID: riverId,
+                                riverID: river_id,
                                 time: time,
                                 timeunit: "minutes",
                                 distance: dist,
