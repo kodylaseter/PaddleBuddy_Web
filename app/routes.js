@@ -52,7 +52,7 @@ module.exports = function(app, passport, connection) {
                     id: rows.insertId
                 };
                 //var check = connection.query('SELECT * FROM link WHERE river = ?', [riverID], function(error, rows) {
-                var check = connection.query('SELECT COUNT(*) as count FROM link WHERE river = ?', riverID, function(error, result) {
+                var check = connection.query('SELECT COUNT(*) as count FROM link WHERE riverId = ?', riverID, function(error, result) {
                     if (error) res.send(error);
                     else {
                         if (result.length < 1) {
@@ -63,7 +63,7 @@ module.exports = function(app, passport, connection) {
                                 begin: prevPointID,
                                 end: point.id,
                                 speed: 1,
-                                river: riverID
+                                riverId: riverID
                             };
                             var test = connection.query('INSERT INTO link SET ?', link, function(error) {
                                 if (error) res.send(error);
@@ -125,7 +125,7 @@ module.exports = function(app, passport, connection) {
     app.post('/api/mobile/closest_river', function(req, res) {
         var point = JSON.parse(JSON.stringify(req.body));
         //source http://stackoverflow.com/a/5933294
-        var query = 'SELECT river_id ,((ACOS(SIN(' + point.Lat + ' * PI() / 180) * SIN(`lat` * PI() / 180) + COS(' + point.Lat + ' * PI() / 180) * COS(`lat` * PI() / 180) * COS((' + point.Lng + ' - `lng`) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) AS `distance` FROM `point` WHERE (`lat` BETWEEN (' + point.Lat + ' - ' + 2 + ') AND (' + point.Lat + ' + ' + 2 + ') AND `lng` BETWEEN (' + point.Lng + ' - ' + 2 + ') AND (' + point.Lng + ' + ' + 2 + ')) ORDER BY `distance` ASC limit 1;';
+        var query = 'SELECT riverId ,((ACOS(SIN(' + point.Lat + ' * PI() / 180) * SIN(`lat` * PI() / 180) + COS(' + point.Lat + ' * PI() / 180) * COS(`lat` * PI() / 180) * COS((' + point.Lng + ' - `lng`) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) AS `distance` FROM `point` WHERE (`lat` BETWEEN (' + point.Lat + ' - ' + 2 + ') AND (' + point.Lat + ' + ' + 2 + ') AND `lng` BETWEEN (' + point.Lng + ' - ' + 2 + ') AND (' + point.Lng + ' + ' + 2 + ')) ORDER BY `distance` ASC limit 1;';
         var response = {};
         connection.query(query, function(error, rows) {
             if (error) {
@@ -210,7 +210,7 @@ module.exports = function(app, passport, connection) {
         var id2 = req.headers.p2;
         var river_id = req.headers.river;
         if (id1 && id2 && river_id) {
-            connection.query('select l.*, p1.*, p2.* from link l inner join (select lat as begin_lat, lng as begin_lng, id as begin_id from point) p1 on l.begin = p1.begin_id inner join (select lat as end_lat, lng as end_lng, id as end_id from point) p2 on l.end = p2.end_id where river = ?', river_id, function(error, rows) {
+            connection.query('select l.*, p1.*, p2.* from link l inner join (select lat as begin_lat, lng as begin_lng, id as begin_id from point) p1 on l.begin = p1.begin_id inner join (select lat as end_lat, lng as end_lng, id as end_id from point) p2 on l.end = p2.end_id where riverId = ?', river_id, function(error, rows) {
                 if (error) {
                     response.success = false;
                     response.detail = error;
