@@ -16,3 +16,5 @@ CREATE TABLE `pb_test`.`link` (
   `end` INT NOT NULL,
   `speed` FLOAT NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`));
+
+  Connection URL: mysql://$OPENSHIFT_MYSQL_DB_HOST:$OPENSHIFT_MYSQL_DB_PORT/
